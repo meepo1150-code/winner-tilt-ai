@@ -26,3 +26,9 @@ Do not remove archived obsolete versions until references in reports/manifests a
 - Data/view-model helpers: `winner_tilt.dashboard`.
 - Documentation: `docs/winner-tilt-dashboard-foundation-v1.0.md`.
 - Dashboard dependencies are optional via `python -m pip install -e ".[dashboard]"`.
+
+## Decision Journal
+- Engine: `src/winner_tilt/decision_journal.py`.
+- Contract/schema: `docs/winner-tilt-decision-journal-v1.0.md` and `database/winner-tilt-decision-journal-schema-v1.json`.
+- Synthetic prototype JSONL: `reports/winner-tilt-m8-synthetic-prototype-decision-journal-v1.0.jsonl`.
+- Dashboard consumption is read-only; the dashboard never creates or edits journal records.

@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 import json
+from winner_tilt.decision_journal import canonical_json, sha256_text, validate_record
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_INPUTS = {
@@ -17,6 +18,7 @@ DEFAULT_INPUTS = {
     "backtest": Path("reports/winner-tilt-m5-prototype-backtest-run-v1.0.json"),
     "research": Path("reports/winner-tilt-research-prototype-run-v1.0.json"),
     "events": Path("reports/winner-tilt-m6-prototype-events-v1.0.json"),
+    "journal": Path("reports/winner-tilt-m8-synthetic-prototype-decision-journal-v1.0.jsonl"),
 }
 
 REQUIRED = {
@@ -25,6 +27,7 @@ REQUIRED = {
     "backtest": ["validation_status", "metrics", "benchmark_metrics", "relative_metrics", "integrity_validation"],
     "research": ["run_status", "non_interference", "accepted_events"],
     "events": ["events"],
+    "journal": [],
 }
 
 @dataclass(frozen=True)
@@ -48,7 +51,24 @@ def _load_json(name: str, relative_path: Path, root: Path) -> DashboardInput:
     path = repo_path(relative_path, root)
     if not path.exists():
         raise FileNotFoundError(f"Missing required dashboard input '{name}': {relative_path}")
-    data = json.loads(path.read_text(encoding="utf-8"))
+    if name == "journal":
+        records = []
+        seen_ids = set()
+        seen_hashes = set()
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            rec = json.loads(line)
+            validate_record(rec)
+            if rec["journal_record_id"] in seen_ids or rec["immutable_record_hash"] in seen_hashes:
+                raise ValueError("duplicate journal record detected")
+            seen_ids.add(rec["journal_record_id"])
+            seen_hashes.add(rec["immutable_record_hash"])
+            records.append(rec)
+        chain = sha256_text("\n".join(r["immutable_record_hash"] for r in records)) if records else None
+        data = {"records": records, "integrity": {"valid": True, "record_count": len(records), "journal_chain_sha256": chain}}
+    else:
+        data = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise ValueError(f"Dashboard input '{name}' must be a JSON object")
     missing = [field for field in REQUIRED[name] if field not in data]
@@ -80,6 +100,7 @@ def build_dashboard_view_model(loaded: dict[str, DashboardInput], *, stale_after
     score = loaded["score"].data
     backtest = loaded["backtest"].data
     research = loaded["research"].data
+    journal = loaded.get("journal")
 
     freshness = []
     warnings = []
@@ -102,6 +123,20 @@ def build_dashboard_view_model(loaded: dict[str, DashboardInput], *, stale_after
     dca = portfolio["dca_allocation"]
     score_rows = sorted(score["results"], key=lambda r: r.get("overall_rank") or 999)[:30]
 
+    journal_records = []
+    if journal:
+        for rec in sorted(journal.data["records"], key=lambda r: r["decision_timestamp_utc"], reverse=True)[:10]:
+            journal_records.append({
+                "journal_record_id": rec["journal_record_id"],
+                "decision_type": rec["decision_type"],
+                "decision_timestamp_utc": rec["decision_timestamp_utc"],
+                "validation_status": rec["validation_status"],
+                "immutable_record_hash": rec["immutable_record_hash"],
+                "synthetic_prototype": rec["synthetic_prototype"],
+                "evidence_refs": [ref.get("path") for ref in rec.get("rationale_evidence_refs", [])],
+                "warnings": rec.get("warnings", []),
+            })
+
     return {
         "status": {
             "dashboard_mode": "READ_ONLY_PRESENTATION_ONLY",
@@ -117,4 +152,5 @@ def build_dashboard_view_model(loaded: dict[str, DashboardInput], *, stale_after
         "backtest": {"metrics": backtest["metrics"], "benchmark_metrics": backtest["benchmark_metrics"], "relative_metrics": backtest["relative_metrics"], "integrity_validation": backtest["integrity_validation"]},
         "research": {"non_interference": non_interference, "events": research["accepted_events"]},
         "freshness": freshness,
+        "journal": {"recent_entries": journal_records, "integrity": journal.data["integrity"] if journal else None},
     }

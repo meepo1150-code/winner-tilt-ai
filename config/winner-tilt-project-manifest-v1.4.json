@@ -1,8 +1,8 @@
 {
   "project": "Winner Tilt AI",
-  "manifest_version": "1.5",
+  "manifest_version": "1.6",
   "generated_at": "2026-07-23",
-  "milestone_6_status": "COMPLETE_ENGINE_FROZEN_SOURCE_INTEGRATIONS_PENDING",
+  "milestone_8_status": "DECISION_JOURNAL_AUDIT_LAYER_COMPLETE_PRODUCTION_INTEGRATIONS_PENDING",
   "previous_manifest": "config/winner-tilt-project-manifest-v1.4.json",
   "files": [
     {
@@ -27,18 +27,18 @@
     },
     {
       "path": "PROJECT_STRUCTURE.md",
-      "sha256": "e6fe11fb955a32488a1c7225607ee892fdb65599366c2e81c64fcfaa8ef56343",
-      "bytes": 1627
+      "sha256": "65538aeee9e4155dbd65a3bffc7030bac38453e110a37831dc2b0b90a45507c4",
+      "bytes": 2015
     },
     {
       "path": "README.md",
-      "sha256": "29b6957eccafc60a5cea4ca37def96a48b6f2932927224f0b7598e04771f336a",
-      "bytes": 2801
+      "sha256": "1259f86bf5c59f98f5d9d746c6944a20bcca58265e2180e5ba8bcbaed50b24aa",
+      "bytes": 3451
     },
     {
       "path": "apps/dashboard/streamlit_app.py",
-      "sha256": "58ac376b3b56ecb6ef5bf36c9519e3d90d6390d031b68e7bd6516a719dee2db9",
-      "bytes": 1556
+      "sha256": "0729c8f333f784ab66277c39046cb3632234c3a7fd718e16465b9626d0fe54be",
+      "bytes": 1888
     },
     {
       "path": "archive/winner-tilt-project-manifest-v1.1.json",
@@ -87,8 +87,8 @@
     },
     {
       "path": "config/winner-tilt-project-manifest-v1.4.json",
-      "sha256": "e86508aa14f9bcdca900aad6f37737e74f9721cf9e2fc88fe03c11f452bcf39d",
-      "bytes": 11353
+      "sha256": "2f38901304997658d407fe65d2bd439ebf7d85a5f68b1e50a1ac4f8ec4be1010",
+      "bytes": 13149
     },
     {
       "path": "config/winner-tilt-research-config-v1.0.0.json",
@@ -114,6 +114,11 @@
       "path": "database/winner-tilt-business-model-modules-v1.0.csv",
       "sha256": "364e1516a1282bd840fbe741569967cd08a18a66e232327ef93d67d438d18cc3",
       "bytes": 7527
+    },
+    {
+      "path": "database/winner-tilt-decision-journal-schema-v1.json",
+      "sha256": "234c71f5c7b39e2e94debc7f30725e0c7a8631558e145d5799ee6e740e77fa70",
+      "bytes": 1130
     },
     {
       "path": "database/winner-tilt-event-registry-v1.0.csv",
@@ -181,6 +186,11 @@
       "bytes": 5748
     },
     {
+      "path": "docs/winner-tilt-decision-journal-v1.0.md",
+      "sha256": "3547987e8b5717dcf50a1208e0aef6a59b20a9fd89e79fb619c67aade055c091",
+      "bytes": 4189
+    },
+    {
       "path": "docs/winner-tilt-m6-upload-guide-v1.0.md",
       "sha256": "f30c24020e32292a6ada8fcb2d2c264ddae5e8bcd907ef2f4501d45fb24cb606",
       "bytes": 885
@@ -207,8 +217,8 @@
     },
     {
       "path": "docs/winner-tilt-spec-v1.4.md",
-      "sha256": "341a20378138523e6e1afab382ea25fb6699a84a0df71325ffbee5ece0928dfa",
-      "bytes": 3005
+      "sha256": "5263e75b248daf2fad5d1cda78ce5e7b74dc0e11e0b07b4ca9c709610dbdab91",
+      "bytes": 3596
     },
     {
       "path": "pyproject.toml",
@@ -266,6 +276,11 @@
       "bytes": 334
     },
     {
+      "path": "reports/winner-tilt-m8-synthetic-prototype-decision-journal-v1.0.jsonl",
+      "sha256": "198a84276531f872a9f5c12939f87dde7edf0befccf4467e922d16c957032374",
+      "bytes": 230338
+    },
+    {
       "path": "reports/winner-tilt-project-file-audit-m3.md",
       "sha256": "65a693ee6bf09f9d7624492279ec42bf65e0608162e1b0574b68be3564c1a5bd",
       "bytes": 1799
@@ -307,8 +322,13 @@
     },
     {
       "path": "src/winner_tilt/dashboard.py",
-      "sha256": "0fa0fce68608e54b060729262dbe8bb33483483543eb6df12878fcb89e549c34",
-      "bytes": 5401
+      "sha256": "e0d9404fef6bd94c4b00ab655986079c8c13e7e6edb71fc5e5ce175996513ad8",
+      "bytes": 7359
+    },
+    {
+      "path": "src/winner_tilt/decision_journal.py",
+      "sha256": "714285df233ceaa79bb1fbee328bd3920d66f653187f4994ed788882ed258a3f",
+      "bytes": 12594
     },
     {
       "path": "src/winner_tilt/portfolio.py",
@@ -332,8 +352,13 @@
     },
     {
       "path": "tests/test_winner_tilt_dashboard.py",
-      "sha256": "f66a0818a6aa20426320501bb2681291f1eba4a4220e97cc9d25e68da753738a",
-      "bytes": 1563
+      "sha256": "0d33636cb7bc8e8334ee889018414a178e99d8e22d479112bf15056e6f60e604",
+      "bytes": 1867
+    },
+    {
+      "path": "tests/test_winner_tilt_decision_journal.py",
+      "sha256": "6a84fde86dcdb24fcdf46aa7f89e7a9f98474b84ea3e3bc5cee4b5ef362ade8f",
+      "bytes": 4187
     },
     {
       "path": "tests/test_winner_tilt_portfolio_engine_v1.py",
@@ -350,6 +375,5 @@
       "sha256": "10d958ac8a518330aa67c849767914abb39b3d4917c826609f7e28550d7796c4",
       "bytes": 781
     }
-  ],
-  "milestone_7_status": "DASHBOARD_FOUNDATION_COMPLETE"
+  ]
 }

@@ -49,3 +49,9 @@ The Research Engine may explain events but may not modify:
 
 ## Governance
 Frozen model rules may not be changed solely to improve historical performance. Production validity is a property of both the engine and supplied data. Missing data-integrity requirements cannot be waived by configuration. Research events without reliable publication timestamps fail closed.
+
+## Milestone 8 module status — Decision Journal
+
+Status: `DECISION_JOURNAL_AUDIT_LAYER_COMPLETE_PRODUCTION_INTEGRATIONS_PENDING`.
+
+The Decision Journal is a non-interfering audit layer. It records existing run outputs, evidence references, timestamps, validation state, synthetic/prototype labels, non-interference attestations, and immutable hashes. It must not modify frozen scoring, portfolio, backtest, research, or dashboard business logic. Production use remains gated on durable production run identifiers, vendor source snapshots, and approved immutable retention infrastructure.
