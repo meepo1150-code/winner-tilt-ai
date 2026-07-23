@@ -72,3 +72,17 @@ The dashboard data contract and known limitations are documented in `docs/winner
 ## Decision Journal integration
 
 Milestone 8 adds a deterministic, append-only Decision Journal audit layer. It records existing prototype evidence, run references, timestamps, displayed holdings/reserves/scores/weights/DCA/exits/turnover, validation status, warnings, non-interference attestations, and immutable hashes without changing frozen investment logic. The dashboard remains read-only and displays recent journal entries from `reports/winner-tilt-m8-synthetic-prototype-decision-journal-v1.0.jsonl`. The prototype journal is synthetic validation output only and is not investment evidence. See `docs/winner-tilt-decision-journal-v1.0.md`.
+
+
+## Production Data Integration
+
+Milestone 9 adds an ingest-only production data integration validation layer in `winner_tilt.data_integration`. It accepts externally supplied universe, metric, and event snapshots, validates required fields, source tiers, duplicate natural keys, security links, UTC timestamps, and point-in-time cutoffs, then emits a deterministic fail-closed audit report. The integration layer does not fetch network data and does not alter scoring, portfolio construction, backtesting, research, DCA, or dashboard behavior.
+
+```bash
+python -m winner_tilt.data_integration \
+  --universe database/universe-v1.0.csv \
+  --metrics path/to/production-metrics.csv \
+  --events path/to/production-events.csv \
+  --information-cutoff 2026-07-23T00:00:00Z \
+  --output reports/production-data-integration-report.json
+```
