@@ -24,6 +24,9 @@ def test_dashboard_view_model_is_read_only_and_labeled():
     assert len(vm["holdings"]) == 15
     assert len(vm["reserves"]) == 15
     assert any("not investment evidence" in w for w in vm["status"]["warnings"])
+    assert vm["journal"]["integrity"]["valid"] is True
+    assert vm["journal"]["recent_entries"]
+    assert vm["journal"]["recent_entries"][0]["synthetic_prototype"] is True
     assert before == {k: v.data for k, v in loaded.items()}
 
 
@@ -31,6 +34,9 @@ def test_dashboard_fails_closed_on_missing_required_field(tmp_path):
     for name, rel in DEFAULT_INPUTS.items():
         target = tmp_path / rel
         target.parent.mkdir(parents=True, exist_ok=True)
+        if name == "journal":
+            target.write_text((repo_path(rel)).read_text(), encoding="utf-8")
+            continue
         data = json.loads((repo_path(rel)).read_text())
         if name == "portfolio":
             data.pop("holdings")

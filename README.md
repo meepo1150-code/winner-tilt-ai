@@ -68,3 +68,7 @@ python -m streamlit run apps/dashboard/streamlit_app.py
 ```
 
 The dashboard data contract and known limitations are documented in `docs/winner-tilt-dashboard-foundation-v1.0.md`.
+
+## Decision Journal integration
+
+Milestone 8 adds a deterministic, append-only Decision Journal audit layer. It records existing prototype evidence, run references, timestamps, displayed holdings/reserves/scores/weights/DCA/exits/turnover, validation status, warnings, non-interference attestations, and immutable hashes without changing frozen investment logic. The dashboard remains read-only and displays recent journal entries from `reports/winner-tilt-m8-synthetic-prototype-decision-journal-v1.0.jsonl`. The prototype journal is synthetic validation output only and is not investment evidence. See `docs/winner-tilt-decision-journal-v1.0.md`.
