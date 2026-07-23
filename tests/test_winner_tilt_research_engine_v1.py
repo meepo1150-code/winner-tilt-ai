@@ -1,13 +1,10 @@
-import importlib.util
 import json
 import pathlib
 
+from winner_tilt import research
+
 BASE = pathlib.Path(__file__).resolve().parent
-P = BASE / "winner_tilt_research_engine_v1.py"
-spec = importlib.util.spec_from_file_location("research", P)
-research = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(research)
-CFG = json.loads((BASE / "winner-tilt-research-config-v1.0.0.json").read_text())
+CFG = json.loads((BASE.parents[0] / "config" / "winner-tilt-research-config-v1.0.0.json").read_text())
 
 
 def event(**overrides):

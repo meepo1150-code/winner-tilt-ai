@@ -1,6 +1,5 @@
-import importlib.util, json, pathlib, tempfile
-P=pathlib.Path('/mnt/data/winner_tilt_backtest_engine_v2.py')
-spec=importlib.util.spec_from_file_location('bt',P); bt=importlib.util.module_from_spec(spec); spec.loader.exec_module(bt)
+import json, pathlib, tempfile
+from winner_tilt import backtest as bt
 
 def test_performance_uptrend():
     m=bt.performance([100,101,102,103])
