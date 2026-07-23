@@ -1,0 +1,1 @@
+{"schema_version":"1.0.0","config_version":"1.0.0","timezone":"UTC","schedules":[{"name":"daily-offline-orchestration","enabled":true,"cron":"0 22 * * 1-5","requires_manual_approval":true}],"unsafe_network_execution":false}

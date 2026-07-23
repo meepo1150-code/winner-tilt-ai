@@ -1,0 +1,1 @@
+{"schema_version":"1.0.0","config_version":"1.0.0","fail_closed":true,"max_staleness_days":7,"reject_future_dated_observations":true,"reject_unknown_settings":true,"required_provenance_fields":["source_reference","retrieval_method","license"]}

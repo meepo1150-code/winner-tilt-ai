@@ -55,3 +55,9 @@ Frozen model rules may not be changed solely to improve historical performance. 
 Status: `DECISION_JOURNAL_AUDIT_LAYER_COMPLETE_PRODUCTION_INTEGRATIONS_PENDING`.
 
 The Decision Journal is a non-interfering audit layer. It records existing run outputs, evidence references, timestamps, validation state, synthetic/prototype labels, non-interference attestations, and immutable hashes. It must not modify frozen scoring, portfolio, backtest, research, or dashboard business logic. Production use remains gated on durable production run identifiers, vendor source snapshots, and approved immutable retention infrastructure.
+
+## Milestone 9 production integration architecture addendum
+
+Status: `PRODUCTION_INTEGRATION_ARCHITECTURE_COMPLETE_LIVE_INTEGRATIONS_PENDING`.
+
+The production architecture is additive and offline: provider interfaces, validation, snapshots, scheduler orchestration, health checks, and structured logging are implemented without changing Milestones 1–8 investment logic. Live vendors, credentials, licensed datasets, production operations, and real investment performance evidence remain pending.
