@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Winner Tilt AI Decision Journal Record v1.0",
+  "type": "object",
+  "required": ["contract_version", "journal_record_id", "run_id", "decision_type", "decision_timestamp_utc", "effective_date", "as_of_date", "system_identifiers", "config_identifiers", "source_snapshot_identifiers", "universe_snapshot_ref", "score_run_ref", "validation_status", "synthetic_prototype", "input_data_cutoff_utc", "selected_holdings", "reserves", "ranks_and_scores", "portfolio_weights", "dca_allocation", "exits", "entries", "turnover", "warnings", "rationale_evidence_refs", "non_interference_attestation", "immutable_record_hash"],
+  "properties": {
+    "contract_version": {"const": "winner-tilt-decision-journal-v1.0"},
+    "decision_type": {"enum": ["monthly_score_review", "semiannual_rebalance", "dca_allocation", "backtest_validation", "research_context_publication", "dashboard_snapshot_publication"]},
+    "synthetic_prototype": {"type": "boolean"},
+    "immutable_record_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": true
+}
