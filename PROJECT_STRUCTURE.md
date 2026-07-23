@@ -3,7 +3,8 @@
 Generated: 2026-07-23
 
 ## Top-Level Layout
-- `src/winner_tilt/` — installable Python package containing the active engines.
+- `apps/dashboard/` — Streamlit entry point for the read-only dashboard foundation.
+- `src/winner_tilt/` — installable Python package containing the active engines and dashboard presentation helpers.
 - `tests/` — automated Python test suites.
 - `config/` — frozen runtime configuration and active project manifest.
 - `database/` — SQL schemas, CSV datasets, registries, taxonomy, and synthetic observations.
@@ -19,3 +20,9 @@ Generated: 2026-07-23
 
 ## Archive Policy
 Do not remove archived obsolete versions until references in reports/manifests are intentionally rewritten or a retention decision is approved.
+
+## Dashboard Foundation
+- Entry point: `apps/dashboard/streamlit_app.py`.
+- Data/view-model helpers: `winner_tilt.dashboard`.
+- Documentation: `docs/winner-tilt-dashboard-foundation-v1.0.md`.
+- Dashboard dependencies are optional via `python -m pip install -e ".[dashboard]"`.

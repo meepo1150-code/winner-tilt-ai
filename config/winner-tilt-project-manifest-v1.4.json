@@ -1,9 +1,9 @@
 {
   "project": "Winner Tilt AI",
-  "manifest_version": "1.4",
+  "manifest_version": "1.5",
   "generated_at": "2026-07-23",
   "milestone_6_status": "COMPLETE_ENGINE_FROZEN_SOURCE_INTEGRATIONS_PENDING",
-  "previous_manifest": "archive/winner-tilt-project-manifest-v1.3.json",
+  "previous_manifest": "config/winner-tilt-project-manifest-v1.4.json",
   "files": [
     {
       "path": ".github/workflows/tests.yml",
@@ -27,13 +27,18 @@
     },
     {
       "path": "PROJECT_STRUCTURE.md",
-      "sha256": "d675ec6b1dff00c423d347955a318b56e76c777ab0cc9e3e7d7fcf7cc2b10575",
-      "bytes": 1228
+      "sha256": "e6fe11fb955a32488a1c7225607ee892fdb65599366c2e81c64fcfaa8ef56343",
+      "bytes": 1627
     },
     {
       "path": "README.md",
-      "sha256": "4bdcf7750eea7fd469af438eae51de5f486bac37a9eae07acb94c576521f657f",
-      "bytes": 2115
+      "sha256": "29b6957eccafc60a5cea4ca37def96a48b6f2932927224f0b7598e04771f336a",
+      "bytes": 2801
+    },
+    {
+      "path": "apps/dashboard/streamlit_app.py",
+      "sha256": "58ac376b3b56ecb6ef5bf36c9519e3d90d6390d031b68e7bd6516a719dee2db9",
+      "bytes": 1556
     },
     {
       "path": "archive/winner-tilt-project-manifest-v1.1.json",
@@ -79,6 +84,11 @@
       "path": "config/winner-tilt-portfolio-config-v1.0.0.json",
       "sha256": "f7fe1fc4da26c33aa1a4bdfbe02e4e4d21389a34dcfd69d90b414fbc7d687856",
       "bytes": 1045
+    },
+    {
+      "path": "config/winner-tilt-project-manifest-v1.4.json",
+      "sha256": "e86508aa14f9bcdca900aad6f37737e74f9721cf9e2fc88fe03c11f452bcf39d",
+      "bytes": 11353
     },
     {
       "path": "config/winner-tilt-research-config-v1.0.0.json",
@@ -161,6 +171,11 @@
       "bytes": 1921
     },
     {
+      "path": "docs/winner-tilt-dashboard-foundation-v1.0.md",
+      "sha256": "516ec6881f6d76739e064c279ef6cd5939885aafb069cb94df248c1dd14ab9bb",
+      "bytes": 1609
+    },
+    {
       "path": "docs/winner-tilt-data-model-v1.0.md",
       "sha256": "a5a69fe474168fa47b4e353fdeb0a5e1736d3dc3afc4c3729d76729e9444de41",
       "bytes": 5748
@@ -197,8 +212,8 @@
     },
     {
       "path": "pyproject.toml",
-      "sha256": "4ae4b2cad67fb7b3abac260c94cca76df3207d19b25fcf5c52375329eddd4deb",
-      "bytes": 532
+      "sha256": "cdc4141ff4e48a9df83e608b3a2b36d5f8d9d7bbda9c4608ec2ed7bb1f9b20c9",
+      "bytes": 564
     },
     {
       "path": "reports/winner-tilt-m3-completion-report-v1.0.md",
@@ -291,6 +306,11 @@
       "bytes": 10132
     },
     {
+      "path": "src/winner_tilt/dashboard.py",
+      "sha256": "0fa0fce68608e54b060729262dbe8bb33483483543eb6df12878fcb89e549c34",
+      "bytes": 5401
+    },
+    {
       "path": "src/winner_tilt/portfolio.py",
       "sha256": "f6940a5ed25658fbf204301a71b5844db673c3eb100e84aa64a042015d116670",
       "bytes": 10068
@@ -311,6 +331,11 @@
       "bytes": 2050
     },
     {
+      "path": "tests/test_winner_tilt_dashboard.py",
+      "sha256": "f66a0818a6aa20426320501bb2681291f1eba4a4220e97cc9d25e68da753738a",
+      "bytes": 1563
+    },
+    {
       "path": "tests/test_winner_tilt_portfolio_engine_v1.py",
       "sha256": "b530e3fffa9f0658e50845eb5c872456fe165f26f3435f97dd13a9e05bd4cbd2",
       "bytes": 3918
@@ -325,5 +350,6 @@
       "sha256": "10d958ac8a518330aa67c849767914abb39b3d4917c826609f7e28550d7796c4",
       "bytes": 781
     }
-  ]
+  ],
+  "milestone_7_status": "DASHBOARD_FOUNDATION_COMPLETE"
 }

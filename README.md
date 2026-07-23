@@ -15,6 +15,7 @@ The repository contains four active Python engines packaged under `winner_tilt`:
 
 ```text
 .
+├── apps/dashboard/       # Streamlit read-only dashboard entry point
 ├── archive/              # Historical manifests, specs, and replaced prototype code
 ├── config/               # Frozen runtime configuration and active project manifest
 ├── database/             # CSV datasets, registries, taxonomy, and SQL schemas
@@ -34,7 +35,7 @@ source .venv/bin/activate
 python -m pip install -e .
 ```
 
-No third-party runtime packages are required by the active engines. Runtime dependencies remain empty.
+No third-party runtime packages are required by the active engines. Runtime dependencies remain empty. Dashboard dependencies are isolated behind the optional `dashboard` extra.
 
 For development and test work, install the package with the optional development dependencies:
 
@@ -55,3 +56,15 @@ python -m pytest -q
 - Tests import the package modules directly from `winner_tilt`.
 - Historical files remain in `archive/` and should not be deleted without a retention decision.
 - Generated reports and prototype output snapshots live in `reports/`.
+
+
+## Dashboard foundation
+
+Milestone 7 adds a read-only Streamlit dashboard that presents existing report snapshots without changing scoring, portfolio, backtest, or research business logic. Synthetic, prototype, stale, incomplete, and validation-only data is clearly labeled and is not investment evidence.
+
+```bash
+python -m pip install -e ".[dashboard]"
+python -m streamlit run apps/dashboard/streamlit_app.py
+```
+
+The dashboard data contract and known limitations are documented in `docs/winner-tilt-dashboard-foundation-v1.0.md`.
