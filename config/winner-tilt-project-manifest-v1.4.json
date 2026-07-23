@@ -1,8 +1,8 @@
 {
   "project": "Winner Tilt AI",
-  "manifest_version": "1.6",
+  "manifest_version": "1.7",
   "generated_at": "2026-07-23",
-  "milestone_8_status": "DECISION_JOURNAL_AUDIT_LAYER_COMPLETE_PRODUCTION_INTEGRATIONS_PENDING",
+  "milestone_9_status": "PRODUCTION_DATA_INTEGRATION_COMPLETE",
   "previous_manifest": "config/winner-tilt-project-manifest-v1.4.json",
   "files": [
     {
@@ -32,8 +32,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "1259f86bf5c59f98f5d9d746c6944a20bcca58265e2180e5ba8bcbaed50b24aa",
-      "bytes": 3451
+      "sha256": "0398f29b9bf1665e2e66b80caf4a98c1dc72f7341687b0a1e8e41c7fd28b2937",
+      "bytes": 4286
     },
     {
       "path": "apps/dashboard/streamlit_app.py",
@@ -87,7 +87,7 @@
     },
     {
       "path": "config/winner-tilt-project-manifest-v1.4.json",
-      "sha256": "2f38901304997658d407fe65d2bd439ebf7d85a5f68b1e50a1ac4f8ec4be1010",
+      "sha256": "0d01c88bf3acaab4977819e4c5f1c50ec69ee357c3ad098e8d4eacc9a1fe3900",
       "bytes": 13149
     },
     {
@@ -201,6 +201,11 @@
       "bytes": 2388
     },
     {
+      "path": "docs/winner-tilt-production-data-integration-v1.0.md",
+      "sha256": "e9f2d2ae15b5c14bdeade7f1a975893c47a3d470968429c89fbd15608e4017dc",
+      "bytes": 2307
+    },
+    {
       "path": "docs/winner-tilt-research-policy-v1.0.md",
       "sha256": "61c08d0833e122a8e3d087354469e322902b762813f750297bbe7b00bf6955d4",
       "bytes": 3893
@@ -222,7 +227,7 @@
     },
     {
       "path": "pyproject.toml",
-      "sha256": "cdc4141ff4e48a9df83e608b3a2b36d5f8d9d7bbda9c4608ec2ed7bb1f9b20c9",
+      "sha256": "ac53235fb3e2d7aa75e55e60b7df179c1e164b82cc55bcae902f0e86d0991f7b",
       "bytes": 564
     },
     {
@@ -281,6 +286,11 @@
       "bytes": 230338
     },
     {
+      "path": "reports/winner-tilt-m9-completion-report-v1.0.md",
+      "sha256": "1557bc94501575476b750515bdfd3277ef8c39a3b58f29b88b9bbfe583478749",
+      "bytes": 1394
+    },
+    {
       "path": "reports/winner-tilt-project-file-audit-m3.md",
       "sha256": "65a693ee6bf09f9d7624492279ec42bf65e0608162e1b0574b68be3564c1a5bd",
       "bytes": 1799
@@ -312,7 +322,7 @@
     },
     {
       "path": "src/winner_tilt/__init__.py",
-      "sha256": "bda33027e51132ddcf51c68f04295e419aaec74d4612ee29a67c696987fa994d",
+      "sha256": "83d9494ae10658d47532241a47df18a7ad4e252e823a09be315086af46840d4a",
       "bytes": 53
     },
     {
@@ -324,6 +334,11 @@
       "path": "src/winner_tilt/dashboard.py",
       "sha256": "e0d9404fef6bd94c4b00ab655986079c8c13e7e6edb71fc5e5ce175996513ad8",
       "bytes": 7359
+    },
+    {
+      "path": "src/winner_tilt/data_integration.py",
+      "sha256": "fa999533444e76e8fbc67aec7a1744aa785467335b8bba065f3b4bf0ff8dae7c",
+      "bytes": 8351
     },
     {
       "path": "src/winner_tilt/decision_journal.py",
@@ -354,6 +369,11 @@
       "path": "tests/test_winner_tilt_dashboard.py",
       "sha256": "0d33636cb7bc8e8334ee889018414a178e99d8e22d479112bf15056e6f60e604",
       "bytes": 1867
+    },
+    {
+      "path": "tests/test_winner_tilt_data_integration.py",
+      "sha256": "d5fd83ad73fbb9a0ac930b6cc52a2dedf26181f0f6838e616818315688d85894",
+      "bytes": 2405
     },
     {
       "path": "tests/test_winner_tilt_decision_journal.py",
