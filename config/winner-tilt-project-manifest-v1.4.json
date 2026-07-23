@@ -93,8 +93,8 @@
     },
     {
       "path": "config/winner-tilt-providers-v1.0.0.json",
-      "sha256": "78a7ffec777a3c47eb32e02c3309985464e4fee68aa4d8a48d08018496f57570",
-      "bytes": 1291
+      "sha256": "30c863929bbf1973d089d45461a5214907f9f4ff8e79c49ed0e1f8ddfcd66057",
+      "bytes": 1543
     },
     {
       "path": "config/winner-tilt-research-config-v1.0.0.json",
@@ -373,8 +373,8 @@
     },
     {
       "path": "src/winner_tilt/data_providers/base.py",
-      "sha256": "c1bcd0008b3ff6b1de9cc67eaf090664a3811fb0b687f81cff969d1958c988dc",
-      "bytes": 3184
+      "sha256": "9bf5d0e12ca3df12c355a446ecf62ea6f82d44a8b6c84c4bca7a82e4b448997b",
+      "bytes": 5276
     },
     {
       "path": "src/winner_tilt/data_providers/benchmark.py",
@@ -413,13 +413,13 @@
     },
     {
       "path": "src/winner_tilt/health.py",
-      "sha256": "5b0f54a4d0c52992b4eae1fae585fc5b84372b35f53d5284a7df271ebb381a72",
-      "bytes": 1732
+      "sha256": "f842bb1e1bf40ca957cac6ea3d2bbd571bbee4e845852573e94a801616a90b29",
+      "bytes": 2725
     },
     {
       "path": "src/winner_tilt/operational_logging.py",
-      "sha256": "f7935286c2c1e9c88eaddd701ff378dbaee45ff1c74fe2952d44f70ff5135678",
-      "bytes": 1015
+      "sha256": "7ddc8f400d759ec700697d02b1b552d22d4505a3840d7242d69f27772c064639",
+      "bytes": 1756
     },
     {
       "path": "src/winner_tilt/portfolio.py",
@@ -433,8 +433,8 @@
     },
     {
       "path": "src/winner_tilt/scheduler.py",
-      "sha256": "0b4e6031714a49039ec455814a3003397ada4efc66d2a4edae500de75e89be7d",
-      "bytes": 3581
+      "sha256": "b34e20a7c458bb9f38de626b3336e10c6e60be4cea4a28d3d8ef7fe8f9019068",
+      "bytes": 6142
     },
     {
       "path": "src/winner_tilt/scoring.py",
@@ -443,13 +443,13 @@
     },
     {
       "path": "src/winner_tilt/snapshot_manager.py",
-      "sha256": "128b429036d9eb07f981f645982b63306f9b61837199788ea030b918c8789da3",
-      "bytes": 2718
+      "sha256": "34dc2d368a5342b8c8f182659d1a363527f21c6470aa13434b5aaf9fe05e23a8",
+      "bytes": 7595
     },
     {
       "path": "src/winner_tilt/validation.py",
-      "sha256": "d5200a8dddc5b94a4c6a5cb523ef31cdd7f6b48666145dd3f6236ae0d914dda5",
-      "bytes": 4451
+      "sha256": "33f66e948a9534af275ff5ebe72c0659c1efeb5614c422f1612186076462568a",
+      "bytes": 6923
     },
     {
       "path": "tests/test_winner_tilt_backtest_engine_v2.py",
@@ -473,8 +473,8 @@
     },
     {
       "path": "tests/test_winner_tilt_m9_production_architecture.py",
-      "sha256": "5db0980d60da0734291e672d149ee20858b987bf2e8f52840f50bfcdb4e23a5e",
-      "bytes": 5390
+      "sha256": "569192c0eaca45c99d3ff0bae42e2031f45c7ba34dd523e89ea5fe19f67b3d64",
+      "bytes": 11901
     },
     {
       "path": "tests/test_winner_tilt_portfolio_engine_v1.py",

@@ -2,13 +2,52 @@
   "schema_version": "1.0.0",
   "config_version": "1.0.0",
   "live_integrations_enabled": false,
-  "environment_placeholders": ["WINNER_TILT_VENDOR_API_KEY", "WINNER_TILT_VENDOR_ENDPOINT"],
+  "environment_placeholders": [
+    "${WINNER_TILT_VENDOR_API_KEY}",
+    "${WINNER_TILT_VENDOR_ENDPOINT}"
+  ],
   "providers": [
-    {"dataset_type": "market_data", "provider_id": "synthetic-market-data", "vendor": "Winner Tilt Synthetic", "enabled": true, "credential_env_var": "WINNER_TILT_VENDOR_API_KEY"},
-    {"dataset_type": "fundamentals", "provider_id": "synthetic-fundamentals", "vendor": "Winner Tilt Synthetic", "enabled": true, "credential_env_var": "WINNER_TILT_VENDOR_API_KEY"},
-    {"dataset_type": "estimates", "provider_id": "synthetic-estimates", "vendor": "Winner Tilt Synthetic", "enabled": true, "credential_env_var": "WINNER_TILT_VENDOR_API_KEY"},
-    {"dataset_type": "corporate_actions", "provider_id": "synthetic-corporate-actions", "vendor": "Winner Tilt Synthetic", "enabled": true, "credential_env_var": "WINNER_TILT_VENDOR_API_KEY"},
-    {"dataset_type": "benchmark", "provider_id": "synthetic-benchmark", "vendor": "Winner Tilt Synthetic", "enabled": true, "credential_env_var": "WINNER_TILT_VENDOR_API_KEY"},
-    {"dataset_type": "news", "provider_id": "synthetic-news", "vendor": "Winner Tilt Synthetic", "enabled": true, "credential_env_var": "WINNER_TILT_VENDOR_API_KEY"}
+    {
+      "dataset_type": "market_data",
+      "provider_id": "synthetic-market-data",
+      "vendor": "Winner Tilt Synthetic",
+      "enabled": true,
+      "credential_env_var": "${WINNER_TILT_VENDOR_API_KEY}"
+    },
+    {
+      "dataset_type": "fundamentals",
+      "provider_id": "synthetic-fundamentals",
+      "vendor": "Winner Tilt Synthetic",
+      "enabled": true,
+      "credential_env_var": "${WINNER_TILT_VENDOR_API_KEY}"
+    },
+    {
+      "dataset_type": "estimates",
+      "provider_id": "synthetic-estimates",
+      "vendor": "Winner Tilt Synthetic",
+      "enabled": true,
+      "credential_env_var": "${WINNER_TILT_VENDOR_API_KEY}"
+    },
+    {
+      "dataset_type": "corporate_actions",
+      "provider_id": "synthetic-corporate-actions",
+      "vendor": "Winner Tilt Synthetic",
+      "enabled": true,
+      "credential_env_var": "${WINNER_TILT_VENDOR_API_KEY}"
+    },
+    {
+      "dataset_type": "benchmark",
+      "provider_id": "synthetic-benchmark",
+      "vendor": "Winner Tilt Synthetic",
+      "enabled": true,
+      "credential_env_var": "${WINNER_TILT_VENDOR_API_KEY}"
+    },
+    {
+      "dataset_type": "news",
+      "provider_id": "synthetic-news",
+      "vendor": "Winner Tilt Synthetic",
+      "enabled": true,
+      "credential_env_var": "${WINNER_TILT_VENDOR_API_KEY}"
+    }
   ]
 }
