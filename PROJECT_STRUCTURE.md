@@ -32,3 +32,14 @@ Do not remove archived obsolete versions until references in reports/manifests a
 - Contract/schema: `docs/winner-tilt-decision-journal-v1.0.md` and `database/winner-tilt-decision-journal-schema-v1.json`.
 - Synthetic prototype JSONL: `reports/winner-tilt-m8-synthetic-prototype-decision-journal-v1.0.jsonl`.
 - Dashboard consumption is read-only; the dashboard never creates or edits journal records.
+
+## Milestone 9 production architecture additions
+
+- `src/winner_tilt/data_providers/` — versioned deterministic provider contracts and synthetic in-memory implementations.
+- `src/winner_tilt/validation.py` — fail-closed structured production data validation.
+- `src/winner_tilt/snapshot_manager.py` — immutable snapshot records and integrity verification.
+- `src/winner_tilt/scheduler.py` — dependency-injected orchestration without investment logic.
+- `src/winner_tilt/health.py` — operational health/readiness checks.
+- `src/winner_tilt/operational_logging.py` — structured logging and secret redaction.
+
+Status: `PRODUCTION_INTEGRATION_ARCHITECTURE_COMPLETE_LIVE_INTEGRATIONS_PENDING`.
