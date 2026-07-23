@@ -1,0 +1,9 @@
+PASS test_drawdown
+PASS test_execution_cost
+PASS test_lookahead_rejected
+PASS test_manifest_gate_fails_closed
+PASS test_manifest_gate_passes
+PASS test_membership_effective_dates
+PASS test_performance_uptrend
+PASS test_previous_or_equal
+PASS test_select_uses_membership_and_rank

@@ -1,0 +1,69 @@
+{
+  "project": "Winner Tilt AI",
+  "manifest_version": "1.2",
+  "generated_at": "2026-07-23",
+  "milestone_4_status": "COMPLETE_FROZEN",
+  "previous_manifest": "winner-tilt-project-manifest-v1.1.json",
+  "files": [
+    {
+      "filename": "winner-tilt-spec-v1.2.md",
+      "sha256": "49018e31acbd586768cb953ebc749830e451a8119bcf0a2e09497d2e9ad0194d",
+      "bytes": 2897
+    },
+    {
+      "filename": "winner-tilt-portfolio-policy-v1.0.md",
+      "sha256": "3e54085c06b30afd461126abbe024cfc3fb0adbf3af71e9fe9bba47b516e94cc",
+      "bytes": 2388
+    },
+    {
+      "filename": "winner-tilt-portfolio-config-v1.0.0.json",
+      "sha256": "f7fe1fc4da26c33aa1a4bdfbe02e4e4d21389a34dcfd69d90b414fbc7d687856",
+      "bytes": 1045
+    },
+    {
+      "filename": "winner_tilt_portfolio_engine_v1.py",
+      "sha256": "f6940a5ed25658fbf204301a71b5844db673c3eb100e84aa64a042015d116670",
+      "bytes": 10068
+    },
+    {
+      "filename": "test_winner_tilt_portfolio_engine_v1.py",
+      "sha256": "ce8a274e80d0f9ad4b2990b3c81d6b1ff08287d0e56426e3dc9ee0e369e40820",
+      "bytes": 3857
+    },
+    {
+      "filename": "winner-tilt-prototype-portfolio-run-v1.0.json",
+      "sha256": "8646c7c79a2d47d9eca8446977f8124210609e743ee533ffc0b4e403dd3132c2",
+      "bytes": 27483
+    },
+    {
+      "filename": "winner-tilt-backtest-interface-v1.0.md",
+      "sha256": "f14c50ae8ea6bb364695dc45310fb6cfa8b73a912b5030749332a4b8a06f2214",
+      "bytes": 2017
+    },
+    {
+      "filename": "winner_tilt_backtest_engine_v1.py",
+      "sha256": "9c3b8bb6b87d277fa41e47bde54a11372450eeb9721c015c12a2f9f0de4f7cbb",
+      "bytes": 2830
+    },
+    {
+      "filename": "winner-tilt-portfolio-schema-v1.sql",
+      "sha256": "87e261f766040c6a0097d891b3605ac1e022e2e7433260ce94d319191a8b8860",
+      "bytes": 2447
+    },
+    {
+      "filename": "winner-tilt-m4-test-results-v1.0.txt",
+      "sha256": "06267598dd4e281bb6320031cadfff34fd0df333bd56a4d72e8afcc7c1b630f9",
+      "bytes": 1663
+    },
+    {
+      "filename": "winner-tilt-m4-completion-report-v1.0.md",
+      "sha256": "e5ea5305d077fbc25190112087a7d3ea66426c89ca7532b219c44986b78ed104",
+      "bytes": 1772
+    },
+    {
+      "filename": "winner-tilt-project-file-audit-m4.md",
+      "sha256": "89b7e4a4b09a0dd70e48f35e300135b438207380ababf8767e9cccc990275746",
+      "bytes": 1921
+    }
+  ]
+}

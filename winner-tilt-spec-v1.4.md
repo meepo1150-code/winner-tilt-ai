@@ -1,0 +1,51 @@
+# Winner Tilt AI — Project Specification v1.4
+
+**Architecture status:** Frozen through Milestone 6  
+**Date:** 2026-07-23
+
+## Operating model
+Winner Tilt AI is a rules-based long-term US equity selection system. It scores the approved universe monthly, maintains 15 holdings and 15 reserves, directs DCA only to holdings, rebalances in January and July, validates the frozen process through point-in-time backtests, and attaches timestamped event intelligence as a non-trading research layer.
+
+## Module status
+1. Data Layer — schema frozen; production vendor integrations pending
+2. Universe Engine — methodology frozen
+3. Scoring Engine — complete and frozen
+4. Portfolio Engine — complete and frozen
+5. Backtest Engine — production architecture complete and frozen; real performance validation data-gated
+6. Research Engine — deterministic architecture complete and frozen; production source integrations pending
+7. Dashboard — next
+8. Decision Journal — pending integration
+
+## Milestone 5 completion record
+- Deterministic walk-forward Backtest Engine v2.0.
+- Point-in-time score cutoff and effective-dated membership enforcement.
+- Semiannual execution on the first available January/July trading day.
+- Transaction ledger, costs, turnover, benchmark and performance analytics.
+- Data-manifest gate that fails closed to `VALIDATION_ONLY`.
+- Explicit production requirements for PIT fundamentals and estimates, corporate actions, delistings, benchmark history, timestamps and independent look-ahead validation.
+- Automated Backtest Engine test suite passing 9/9.
+- Synthetic end-to-end run completed but not accepted as investment evidence.
+
+## Milestone 6 completion record
+- Deterministic Research Engine v1.0.
+- Controlled event registry and relational event schema.
+- Mandatory event, publication, ingestion, source, and security-link fields.
+- Point-in-time publication cutoff that rejects future information.
+- Duplicate detection through canonical event fingerprints.
+- Configurable source-tier, event-type, severity, confidence, and time-decay weighting.
+- Security research signal constrained to -2 through +2.
+- Context labels limited to informational language.
+- Explicit non-interference contract preventing research from changing scores, portfolio selections, backtests, or DCA.
+- Automated Research Engine test suite passing 10/10.
+- Synthetic prototype completed but not accepted as investment evidence.
+
+## Frozen module boundary
+The Research Engine may explain events but may not modify:
+- raw metric observations;
+- category or total scores;
+- eligibility or ranking;
+- holdings, reserves, weights, exits, turnover, or DCA;
+- historical backtest decisions.
+
+## Governance
+Frozen model rules may not be changed solely to improve historical performance. Production validity is a property of both the engine and supplied data. Missing data-integrity requirements cannot be waived by configuration. Research events without reliable publication timestamps fail closed.

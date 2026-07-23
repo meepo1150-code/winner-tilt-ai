@@ -1,0 +1,626 @@
+{
+  "model_name": "Winner Tilt AI Scoring Engine",
+  "version_name": "1.0.0-prototype",
+  "scoring_model_version_id": "WT-SMV-1.0.0-P",
+  "status": "FROZEN",
+  "effective_from": "2026-07-23",
+  "universe_version": "v1.0",
+  "mode": "PRODUCTION_RULES_WITH_SYNTHETIC_VALIDATION_FIXTURE",
+  "flags": {
+    "quality_tier_affects_score": false,
+    "market_regime_affects_stock_score": false,
+    "monthly_rank_trading": false,
+    "specialized_financial_modules_enabled": false,
+    "synthetic_fixture_is_investment_output": false
+  },
+  "principles": {
+    "hard_filters_before_scoring": true,
+    "monthly_scores_do_not_trigger_trades": true,
+    "market_regime_in_stock_score": false,
+    "quality_tier_in_score": false
+  },
+  "stage_category_weights": {
+    "EMG": {
+      "GROWTH": 0.3,
+      "QUALITY": 0.2,
+      "FINANCIAL_STRENGTH": 0.2,
+      "VALUATION": 0.1,
+      "MOMENTUM": 0.1,
+      "CAPITAL_ALLOCATION": 0.05,
+      "RISK": 0.05
+    },
+    "GRW": {
+      "GROWTH": 0.25,
+      "QUALITY": 0.25,
+      "FINANCIAL_STRENGTH": 0.15,
+      "VALUATION": 0.15,
+      "MOMENTUM": 0.1,
+      "CAPITAL_ALLOCATION": 0.05,
+      "RISK": 0.05
+    },
+    "MAT": {
+      "GROWTH": 0.15,
+      "QUALITY": 0.3,
+      "FINANCIAL_STRENGTH": 0.2,
+      "VALUATION": 0.2,
+      "MOMENTUM": 0.05,
+      "CAPITAL_ALLOCATION": 0.05,
+      "RISK": 0.05
+    }
+  },
+  "normalization": {
+    "method": "PERCENTILE_RANK",
+    "winsor_lower": 0.05,
+    "winsor_upper": 0.95,
+    "peer_blend_weight": 0.7,
+    "universe_blend_weight": 0.3,
+    "minimum_peer_count": 6,
+    "score_min": 0,
+    "score_max": 100
+  },
+  "missing_data": {
+    "temporarily_unavailable_score": 50,
+    "minimum_total_weighted_coverage": 0.8,
+    "minimum_major_category_coverage": 0.6,
+    "major_category_weight_threshold": 0.15,
+    "penalty_per_unavailable_weight_pct": 0.2,
+    "stale_critical_metric_penalty": 2.0,
+    "maximum_penalty": 10.0,
+    "structurally_unsupported_production_eligible": false
+  },
+  "staleness_days": {
+    "PRICE": 5,
+    "QUARTERLY_FUNDAMENTAL": 150,
+    "ANNUAL_FUNDAMENTAL": 450,
+    "ESTIMATE": 45
+  },
+  "ranking": {
+    "tie_breakers": [
+      "QUALITY_SCORE_DESC",
+      "FINANCIAL_STRENGTH_SCORE_DESC",
+      "MOM_RS_12M_SCORE_DESC",
+      "SECURITY_ID_ASC"
+    ],
+    "holdings_target": 15,
+    "reserves_target": 15
+  },
+  "rebalance_buffer": {
+    "frequency_months": 6,
+    "protected_hold_rank_max": 20,
+    "challenge_zone_rank_min": 21,
+    "challenge_zone_rank_max": 25,
+    "hard_exit_rank_below": 25,
+    "challenger_rank_advantage_min": 5,
+    "monthly_rank_trading": false
+  },
+  "metrics": [
+    {
+      "metric_id": "GRW_REV_1Y",
+      "metric_name": "Revenue Growth TTM YoY",
+      "category": "GROWTH",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.25,
+      "stage_module": "ALL",
+      "formula_summary": "(Revenue TTM / Revenue prior TTM)-1",
+      "minimum_history": "8 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "GRW_REV_3Y",
+      "metric_name": "Revenue CAGR 3Y",
+      "category": "GROWTH",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.25,
+      "stage_module": "ALL",
+      "formula_summary": "(Revenue FY0 / Revenue FY-3)^(1/3)-1",
+      "minimum_history": "4 fiscal years",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "GRW_EPS_1Y",
+      "metric_name": "EPS Growth TTM YoY",
+      "category": "GROWTH",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.15,
+      "stage_module": "GRW_MAT",
+      "formula_summary": "Adjusted diluted EPS TTM growth; replace for pre-profit firms",
+      "minimum_history": "8 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "GRW_FCF_1Y",
+      "metric_name": "FCF Growth TTM YoY",
+      "category": "GROWTH",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.15,
+      "stage_module": "GRW_MAT",
+      "formula_summary": "FCF TTM growth; replace with burn improvement when both periods negative",
+      "minimum_history": "8 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "GRW_GM_DELTA",
+      "metric_name": "Gross Margin Change",
+      "category": "GROWTH",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.1,
+      "stage_module": "ALL",
+      "formula_summary": "Gross margin TTM minus prior TTM",
+      "minimum_history": "8 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "GRW_OM_DELTA",
+      "metric_name": "Operating Margin Change",
+      "category": "GROWTH",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.1,
+      "stage_module": "ALL",
+      "formula_summary": "Operating margin TTM minus prior TTM",
+      "minimum_history": "8 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "QLT_ROIC",
+      "metric_name": "Return on Invested Capital",
+      "category": "QUALITY",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.25,
+      "stage_module": "GRW_MAT",
+      "formula_summary": "NOPAT / average invested capital",
+      "minimum_history": "8 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "QLT_GM",
+      "metric_name": "Gross Margin TTM",
+      "category": "QUALITY",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.15,
+      "stage_module": "ALL",
+      "formula_summary": "Gross profit TTM / revenue TTM",
+      "minimum_history": "4 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "QLT_OM",
+      "metric_name": "Operating Margin TTM",
+      "category": "QUALITY",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.2,
+      "stage_module": "ALL",
+      "formula_summary": "Operating income TTM / revenue TTM",
+      "minimum_history": "4 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "QLT_FCFM",
+      "metric_name": "FCF Margin TTM",
+      "category": "QUALITY",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.2,
+      "stage_module": "ALL",
+      "formula_summary": "Free cash flow TTM / revenue TTM",
+      "minimum_history": "4 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "QLT_CASH_CONV",
+      "metric_name": "Cash Conversion 3Y Median",
+      "category": "QUALITY",
+      "unit": "ratio",
+      "higher_is_better": true,
+      "default_weight": 0.1,
+      "stage_module": "GRW_MAT",
+      "formula_summary": "Median annual FCF / adjusted net income",
+      "minimum_history": "3 fiscal years",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "QLT_STABILITY",
+      "metric_name": "Operating Margin Dispersion",
+      "category": "QUALITY",
+      "unit": "decimal",
+      "higher_is_better": false,
+      "default_weight": 0.1,
+      "stage_module": "ALL",
+      "formula_summary": "Standard deviation of quarterly operating margin",
+      "minimum_history": "12 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "FIN_NET_DEBT_EBITDA",
+      "metric_name": "Net Debt to EBITDA",
+      "category": "FINANCIAL_STRENGTH",
+      "unit": "ratio",
+      "higher_is_better": false,
+      "default_weight": 0.25,
+      "stage_module": "NON_FINANCIALS",
+      "formula_summary": "(Debt minus cash) / EBITDA TTM",
+      "minimum_history": "4 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "FIN_INTEREST_COVER",
+      "metric_name": "Interest Coverage",
+      "category": "FINANCIAL_STRENGTH",
+      "unit": "ratio",
+      "higher_is_better": true,
+      "default_weight": 0.2,
+      "stage_module": "NON_FINANCIALS",
+      "formula_summary": "EBIT TTM / interest expense TTM",
+      "minimum_history": "4 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "FIN_CURRENT_RATIO",
+      "metric_name": "Current Ratio",
+      "category": "FINANCIAL_STRENGTH",
+      "unit": "ratio",
+      "higher_is_better": true,
+      "default_weight": 0.1,
+      "stage_module": "NON_FINANCIALS",
+      "formula_summary": "Current assets / current liabilities",
+      "minimum_history": "1 quarter",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "FIN_NET_CASH_ASSETS",
+      "metric_name": "Net Cash to Assets",
+      "category": "FINANCIAL_STRENGTH",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.15,
+      "stage_module": "NON_FINANCIALS",
+      "formula_summary": "(Cash minus debt) / total assets",
+      "minimum_history": "1 quarter",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "FIN_DEBT_TREND",
+      "metric_name": "Net Debt Change 1Y",
+      "category": "FINANCIAL_STRENGTH",
+      "unit": "decimal",
+      "higher_is_better": false,
+      "default_weight": 0.1,
+      "stage_module": "NON_FINANCIALS",
+      "formula_summary": "Net debt current minus prior year scaled by assets",
+      "minimum_history": "5 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "FIN_RUNWAY",
+      "metric_name": "Cash Runway Months",
+      "category": "FINANCIAL_STRENGTH",
+      "unit": "months",
+      "higher_is_better": true,
+      "default_weight": 0.2,
+      "stage_module": "EMG",
+      "formula_summary": "Cash and equivalents / monthly FCF burn",
+      "minimum_history": "4 quarters",
+      "mandatory_rule": "Mandatory for Emerging with negative TTM FCF"
+    },
+    {
+      "metric_id": "VAL_EV_SALES_FWD",
+      "metric_name": "Forward EV to Sales",
+      "category": "VALUATION",
+      "unit": "ratio",
+      "higher_is_better": false,
+      "default_weight": 0.4,
+      "stage_module": "EMG",
+      "formula_summary": "Enterprise value / forward revenue",
+      "minimum_history": "Current plus next FY estimate",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "VAL_EV_GP",
+      "metric_name": "EV to Gross Profit",
+      "category": "VALUATION",
+      "unit": "ratio",
+      "higher_is_better": false,
+      "default_weight": 0.25,
+      "stage_module": "EMG",
+      "formula_summary": "Enterprise value / gross profit TTM",
+      "minimum_history": "4 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "VAL_GROWTH_ADJ",
+      "metric_name": "Growth Adjusted EV Sales",
+      "category": "VALUATION",
+      "unit": "ratio",
+      "higher_is_better": false,
+      "default_weight": 0.25,
+      "stage_module": "EMG",
+      "formula_summary": "Forward EV/sales divided by forward revenue growth",
+      "minimum_history": "Forward estimate",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "VAL_EV_EBITDA_FWD",
+      "metric_name": "Forward EV to EBITDA",
+      "category": "VALUATION",
+      "unit": "ratio",
+      "higher_is_better": false,
+      "default_weight": 0.25,
+      "stage_module": "GRW_MAT",
+      "formula_summary": "Enterprise value / forward EBITDA",
+      "minimum_history": "Forward estimate",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "VAL_PEG_FWD",
+      "metric_name": "Forward PEG",
+      "category": "VALUATION",
+      "unit": "ratio",
+      "higher_is_better": false,
+      "default_weight": 0.2,
+      "stage_module": "GRW",
+      "formula_summary": "Forward P/E divided by forward EPS growth",
+      "minimum_history": "Forward estimate",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "VAL_PE_FWD",
+      "metric_name": "Forward PE",
+      "category": "VALUATION",
+      "unit": "ratio",
+      "higher_is_better": false,
+      "default_weight": 0.25,
+      "stage_module": "MAT",
+      "formula_summary": "Price / forward diluted EPS",
+      "minimum_history": "Forward estimate",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "VAL_FCF_YIELD",
+      "metric_name": "FCF Yield TTM",
+      "category": "VALUATION",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.3,
+      "stage_module": "ALL",
+      "formula_summary": "FCF TTM / market capitalization",
+      "minimum_history": "4 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "VAL_REL_HISTORY",
+      "metric_name": "Valuation Percentile vs 5Y History",
+      "category": "VALUATION",
+      "unit": "percentile",
+      "higher_is_better": false,
+      "default_weight": 0.2,
+      "stage_module": "GRW_MAT",
+      "formula_summary": "Current primary multiple percentile in own history",
+      "minimum_history": "5 years",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "MOM_RS_6M",
+      "metric_name": "Relative Strength 6M",
+      "category": "MOMENTUM",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.3,
+      "stage_module": "ALL",
+      "formula_summary": "Security total return minus benchmark return",
+      "minimum_history": "126 trading days",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "MOM_RS_12M",
+      "metric_name": "Relative Strength 12M Ex Recent Month",
+      "category": "MOMENTUM",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.3,
+      "stage_module": "ALL",
+      "formula_summary": "12M return ending 20 trading days before cutoff minus benchmark",
+      "minimum_history": "252 trading days",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "MOM_TREND_200D",
+      "metric_name": "Price vs 200D Average",
+      "category": "MOMENTUM",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.15,
+      "stage_module": "ALL",
+      "formula_summary": "Adjusted close / 200D moving average minus 1",
+      "minimum_history": "200 trading days",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "MOM_EPS_REV_3M",
+      "metric_name": "EPS Estimate Revision 3M",
+      "category": "MOMENTUM",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.15,
+      "stage_module": "ALL",
+      "formula_summary": "Current forward EPS estimate / estimate 3 months prior minus 1",
+      "minimum_history": "Two PIT snapshots",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "MOM_REV_REV_3M",
+      "metric_name": "Revenue Estimate Revision 3M",
+      "category": "MOMENTUM",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.1,
+      "stage_module": "ALL",
+      "formula_summary": "Current forward revenue estimate / estimate 3 months prior minus 1",
+      "minimum_history": "Two PIT snapshots",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "CAP_SHARE_CHANGE",
+      "metric_name": "Diluted Share Count Change YoY",
+      "category": "CAPITAL_ALLOCATION",
+      "unit": "decimal",
+      "higher_is_better": false,
+      "default_weight": 0.35,
+      "stage_module": "ALL",
+      "formula_summary": "Diluted weighted average shares TTM / prior TTM minus 1",
+      "minimum_history": "8 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "CAP_SBC_REVENUE",
+      "metric_name": "SBC to Revenue",
+      "category": "CAPITAL_ALLOCATION",
+      "unit": "decimal",
+      "higher_is_better": false,
+      "default_weight": 0.2,
+      "stage_module": "ALL",
+      "formula_summary": "Stock-based compensation TTM / revenue TTM",
+      "minimum_history": "4 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "CAP_BUYBACK_YIELD",
+      "metric_name": "Net Buyback Yield",
+      "category": "CAPITAL_ALLOCATION",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.2,
+      "stage_module": "GRW_MAT",
+      "formula_summary": "Net repurchases TTM / market capitalization",
+      "minimum_history": "4 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "CAP_ROIC_TREND",
+      "metric_name": "ROIC Trend 3Y",
+      "category": "CAPITAL_ALLOCATION",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.15,
+      "stage_module": "GRW_MAT",
+      "formula_summary": "ROIC current minus three years prior",
+      "minimum_history": "4 fiscal years",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "CAP_INSIDER",
+      "metric_name": "Discretionary Insider Signal",
+      "category": "CAPITAL_ALLOCATION",
+      "unit": "score",
+      "higher_is_better": true,
+      "default_weight": 0.1,
+      "stage_module": "ALL",
+      "formula_summary": "Rules-based net open-market insider purchase signal",
+      "minimum_history": "12 months",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "RSK_VOL_1Y",
+      "metric_name": "Annualized Volatility 1Y",
+      "category": "RISK",
+      "unit": "decimal",
+      "higher_is_better": false,
+      "default_weight": 0.25,
+      "stage_module": "ALL",
+      "formula_summary": "Daily return standard deviation times sqrt(252)",
+      "minimum_history": "252 trading days",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "RSK_DRAWDOWN_3Y",
+      "metric_name": "Maximum Drawdown 3Y",
+      "category": "RISK",
+      "unit": "decimal",
+      "higher_is_better": true,
+      "default_weight": 0.25,
+      "stage_module": "ALL",
+      "formula_summary": "Minimum drawdown from prior adjusted-price peak",
+      "minimum_history": "756 trading days",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "RSK_BETA_2Y",
+      "metric_name": "Beta Excess Above One",
+      "category": "RISK",
+      "unit": "ratio",
+      "higher_is_better": false,
+      "default_weight": 0.1,
+      "stage_module": "ALL",
+      "formula_summary": "Maximum of zero and two-year beta minus one",
+      "minimum_history": "504 trading days",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "RSK_EARN_VOL",
+      "metric_name": "Earnings Volatility",
+      "category": "RISK",
+      "unit": "decimal",
+      "higher_is_better": false,
+      "default_weight": 0.15,
+      "stage_module": "ALL",
+      "formula_summary": "Dispersion of quarterly EPS or operating income",
+      "minimum_history": "12 quarters",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "RSK_DILUTION",
+      "metric_name": "Dilution CAGR 3Y",
+      "category": "RISK",
+      "unit": "decimal",
+      "higher_is_better": false,
+      "default_weight": 0.15,
+      "stage_module": "ALL",
+      "formula_summary": "Three-year CAGR of diluted share count",
+      "minimum_history": "4 fiscal years",
+      "mandatory_rule": ""
+    },
+    {
+      "metric_id": "RSK_EVENT_FLAG",
+      "metric_name": "Severe Event Risk Flag",
+      "category": "RISK",
+      "unit": "score",
+      "higher_is_better": false,
+      "default_weight": 0.1,
+      "stage_module": "ALL",
+      "formula_summary": "Versioned active governance solvency or listing-risk score",
+      "minimum_history": "Current",
+      "mandatory_rule": ""
+    }
+  ],
+  "business_model_modules": {
+    "STANDARD_CORPORATE": {
+      "production_supported": true
+    },
+    "BANK": {
+      "production_supported": false,
+      "reason": "Requires bank-specific capital, credit-quality and valuation metrics."
+    },
+    "INSURER_CONGLOMERATE": {
+      "production_supported": false,
+      "reason": "Requires insurance/conglomerate-specific metrics."
+    },
+    "FINTECH_LENDER": {
+      "production_supported": false,
+      "reason": "Requires lending and credit-quality metrics."
+    },
+    "PRE_PROFIT": {
+      "production_supported": true,
+      "conditions": [
+        "cash_runway_required_when_fcf_negative"
+      ]
+    }
+  },
+  "configuration_sha256": "a5709013e89200e39ee3e2bb3063ff99f55a166467dab5f4ab576d5621a69e4f"
+}

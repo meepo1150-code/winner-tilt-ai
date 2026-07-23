@@ -1,0 +1,238 @@
+{
+  "engine_version": "1.0.0",
+  "run_status": "INFORMATIONAL_ONLY",
+  "information_cutoff": "2026-07-23T00:00:00Z",
+  "lookback_start": "2026-01-24T00:00:00Z",
+  "configuration_sha256": "24a2bb4bdf9a34415ba685a6c52ac4053a5cdfd906682899a2de6e994bb776f9",
+  "non_interference": {
+    "scoring_modified": false,
+    "portfolio_modified": false,
+    "backtest_modified": false,
+    "dca_modified": false
+  },
+  "counts": {
+    "input": 4,
+    "accepted": 3,
+    "rejected": 1,
+    "duplicates": 0,
+    "security_summaries": 2
+  },
+  "accepted_events": [
+    {
+      "event_id": "WT-EVT-20260718-001",
+      "event_type": "EARNINGS_RESULT",
+      "title": "Synthetic issuer reports revenue above internal reference",
+      "summary": "Synthetic validation event; not investment evidence.",
+      "direction": "POSITIVE",
+      "severity": 3,
+      "confidence": 0.9,
+      "event_time": "2026-07-18T20:00:00Z",
+      "published_at": "2026-07-18T20:05:00Z",
+      "ingested_at": "2026-07-18T20:10:00Z",
+      "source_name": "Synthetic Issuer IR",
+      "source_tier": "PRIMARY",
+      "source_url": "https://example.invalid/synthetic/1",
+      "source_external_id": "SYN-1",
+      "security_ids": [
+        "WT-S0001"
+      ],
+      "unverified": false,
+      "canonical_fingerprint": "f936f1e3c0ce261d60b31ba6e975f6fe0358fb705ed2893391caabd0b624d820"
+    },
+    {
+      "event_id": "WT-EVT-20260719-002",
+      "event_type": "GUIDANCE_CHANGE",
+      "title": "Synthetic issuer raises annual guidance",
+      "summary": "Synthetic validation event; not investment evidence.",
+      "direction": "POSITIVE",
+      "severity": 4,
+      "confidence": 0.95,
+      "event_time": "2026-07-19T12:00:00Z",
+      "published_at": "2026-07-19T12:03:00Z",
+      "ingested_at": "2026-07-19T12:05:00Z",
+      "source_name": "Synthetic Issuer IR",
+      "source_tier": "PRIMARY",
+      "source_url": "https://example.invalid/synthetic/2",
+      "source_external_id": "SYN-2",
+      "security_ids": [
+        "WT-S0001",
+        "WT-S0002"
+      ],
+      "unverified": false,
+      "canonical_fingerprint": "4b8e1b3373812b3f42df8a6d9c1212edf7be4fce3d10700aef8236f3d36fa230"
+    },
+    {
+      "event_id": "WT-EVT-20260720-003",
+      "event_type": "CYBERSECURITY_INCIDENT",
+      "title": "Synthetic security incident disclosed",
+      "summary": "Synthetic validation event; not investment evidence.",
+      "direction": "NEGATIVE",
+      "severity": 4,
+      "confidence": 0.8,
+      "event_time": "2026-07-20T02:00:00Z",
+      "published_at": "2026-07-20T08:00:00Z",
+      "ingested_at": "2026-07-20T08:10:00Z",
+      "source_name": "Synthetic Regulatory Filing",
+      "source_tier": "REGULATORY",
+      "source_url": "https://example.invalid/synthetic/3",
+      "source_external_id": "SYN-3",
+      "security_ids": [
+        "WT-S0002"
+      ],
+      "unverified": false,
+      "canonical_fingerprint": "37b58a6b2243ab7dabd3d5d6afa70f64a2f90c1fcba287cf7752f824d57a2cc3"
+    }
+  ],
+  "rejected_events": [
+    {
+      "event_id": "WT-EVT-20260724-004",
+      "errors": [
+        "PUBLICATION_AFTER_CUTOFF"
+      ]
+    }
+  ],
+  "duplicate_events": [],
+  "security_summaries": [
+    {
+      "security_id": "WT-S0001",
+      "research_signal": 1.39052451,
+      "raw_weighted_signal": 1.39052451,
+      "context_label": "POSITIVE_CONTEXT",
+      "event_counts": {
+        "positive": 2,
+        "negative": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "total": 2
+      },
+      "highest_severity": 4,
+      "highest_severity_event_id": "WT-EVT-20260719-002",
+      "dominant_event_types": [
+        "EARNINGS_RESULT",
+        "GUIDANCE_CHANGE"
+      ],
+      "included_event_ids": [
+        "WT-EVT-20260718-001",
+        "WT-EVT-20260719-002"
+      ],
+      "top_events": [
+        {
+          "event_id": "WT-EVT-20260719-002",
+          "event_type": "GUIDANCE_CHANGE",
+          "title": "Synthetic issuer raises annual guidance",
+          "summary": "Synthetic validation event; not investment evidence.",
+          "direction": "POSITIVE",
+          "severity": 4,
+          "confidence": 0.95,
+          "event_time": "2026-07-19T12:00:00Z",
+          "published_at": "2026-07-19T12:03:00Z",
+          "ingested_at": "2026-07-19T12:05:00Z",
+          "source_name": "Synthetic Issuer IR",
+          "source_tier": "PRIMARY",
+          "source_url": "https://example.invalid/synthetic/2",
+          "source_external_id": "SYN-2",
+          "security_ids": [
+            "WT-S0001",
+            "WT-S0002"
+          ],
+          "unverified": false,
+          "canonical_fingerprint": "4b8e1b3373812b3f42df8a6d9c1212edf7be4fce3d10700aef8236f3d36fa230",
+          "event_signal": 0.87588121
+        },
+        {
+          "event_id": "WT-EVT-20260718-001",
+          "event_type": "EARNINGS_RESULT",
+          "title": "Synthetic issuer reports revenue above internal reference",
+          "summary": "Synthetic validation event; not investment evidence.",
+          "direction": "POSITIVE",
+          "severity": 3,
+          "confidence": 0.9,
+          "event_time": "2026-07-18T20:00:00Z",
+          "published_at": "2026-07-18T20:05:00Z",
+          "ingested_at": "2026-07-18T20:10:00Z",
+          "source_name": "Synthetic Issuer IR",
+          "source_tier": "PRIMARY",
+          "source_url": "https://example.invalid/synthetic/1",
+          "source_external_id": "SYN-1",
+          "security_ids": [
+            "WT-S0001"
+          ],
+          "unverified": false,
+          "canonical_fingerprint": "f936f1e3c0ce261d60b31ba6e975f6fe0358fb705ed2893391caabd0b624d820",
+          "event_signal": 0.5146433
+        }
+      ]
+    },
+    {
+      "security_id": "WT-S0002",
+      "research_signal": 0.19323836,
+      "raw_weighted_signal": 0.19323836,
+      "context_label": "MIXED_CONTEXT",
+      "event_counts": {
+        "positive": 1,
+        "negative": 1,
+        "neutral": 0,
+        "mixed": 0,
+        "total": 2
+      },
+      "highest_severity": 4,
+      "highest_severity_event_id": "WT-EVT-20260719-002",
+      "dominant_event_types": [
+        "CYBERSECURITY_INCIDENT",
+        "GUIDANCE_CHANGE"
+      ],
+      "included_event_ids": [
+        "WT-EVT-20260719-002",
+        "WT-EVT-20260720-003"
+      ],
+      "top_events": [
+        {
+          "event_id": "WT-EVT-20260719-002",
+          "event_type": "GUIDANCE_CHANGE",
+          "title": "Synthetic issuer raises annual guidance",
+          "summary": "Synthetic validation event; not investment evidence.",
+          "direction": "POSITIVE",
+          "severity": 4,
+          "confidence": 0.95,
+          "event_time": "2026-07-19T12:00:00Z",
+          "published_at": "2026-07-19T12:03:00Z",
+          "ingested_at": "2026-07-19T12:05:00Z",
+          "source_name": "Synthetic Issuer IR",
+          "source_tier": "PRIMARY",
+          "source_url": "https://example.invalid/synthetic/2",
+          "source_external_id": "SYN-2",
+          "security_ids": [
+            "WT-S0001",
+            "WT-S0002"
+          ],
+          "unverified": false,
+          "canonical_fingerprint": "4b8e1b3373812b3f42df8a6d9c1212edf7be4fce3d10700aef8236f3d36fa230",
+          "event_signal": 0.87588121
+        },
+        {
+          "event_id": "WT-EVT-20260720-003",
+          "event_type": "CYBERSECURITY_INCIDENT",
+          "title": "Synthetic security incident disclosed",
+          "summary": "Synthetic validation event; not investment evidence.",
+          "direction": "NEGATIVE",
+          "severity": 4,
+          "confidence": 0.8,
+          "event_time": "2026-07-20T02:00:00Z",
+          "published_at": "2026-07-20T08:00:00Z",
+          "ingested_at": "2026-07-20T08:10:00Z",
+          "source_name": "Synthetic Regulatory Filing",
+          "source_tier": "REGULATORY",
+          "source_url": "https://example.invalid/synthetic/3",
+          "source_external_id": "SYN-3",
+          "security_ids": [
+            "WT-S0002"
+          ],
+          "unverified": false,
+          "canonical_fingerprint": "37b58a6b2243ab7dabd3d5d6afa70f64a2f90c1fcba287cf7752f824d57a2cc3",
+          "event_signal": -0.68264285
+        }
+      ]
+    }
+  ],
+  "output_sha256": "b04dd2f54a5265cd5d045827219bfaccf5e518e4ad4303e36aa5123bd7d72350"
+}

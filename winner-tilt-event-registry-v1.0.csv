@@ -1,0 +1,16 @@
+event_type,name,default_weight,description
+EARNINGS_RESULT,Earnings Result,1.0,Reported financial results or material operating update
+GUIDANCE_CHANGE,Guidance Change,1.2,Initiated raised maintained or reduced forward guidance
+ANALYST_REVISION,Analyst Revision,0.7,Point-in-time estimate or rating revision from an identified provider
+SEC_FILING,Regulatory Filing,0.8,Material filing with a regulator or exchange
+INSIDER_TRANSACTION,Insider Transaction,0.5,Reported insider purchase sale or ownership change
+BUYBACK,Share Repurchase,0.7,Repurchase authorization expansion execution or suspension
+DIVIDEND_CHANGE,Dividend Change,0.6,Dividend initiation increase reduction or suspension
+M_AND_A,Mergers and Acquisitions,1.0,Acquisition merger divestiture or strategic transaction
+MANAGEMENT_CHANGE,Management Change,0.8,CEO CFO chair or other material leadership transition
+PRODUCT_LAUNCH,Product Launch,0.5,Material product platform service or capacity launch
+REGULATORY_ACTION,Regulatory Action,1.1,Approval rejection investigation restriction or enforcement
+CYBERSECURITY_INCIDENT,Cybersecurity Incident,1.1,Material breach outage ransomware or security disclosure
+LEGAL_EVENT,Legal Event,0.9,Material litigation judgment settlement or liability development
+MACRO_EVENT,Macro Event,0.5,Rates inflation policy trade or demand event linked to the security
+OTHER,Other,0.3,Auditable event not covered by another registry value

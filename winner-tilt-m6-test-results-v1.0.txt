@@ -1,0 +1,10 @@
+PASS test_accepts_valid_event
+PASS test_deterministic_hash
+PASS test_duplicate_fingerprint
+PASS test_mixed_context
+PASS test_negative_signal
+PASS test_non_interference_contract
+PASS test_rejects_ingestion_before_publication
+PASS test_rejects_lookahead_publication
+PASS test_rejects_naive_timestamp
+PASS test_unverified_confidence_cap

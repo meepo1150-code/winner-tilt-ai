@@ -1,0 +1,20 @@
+{
+  "configuration_version": "2.0.0",
+  "status": "FROZEN",
+  "period": {"start": "2024-01-01", "end": "2025-12-31"},
+  "capital": {"initial": 100000.0},
+  "portfolio": {"holdings_count": 15, "weighting": "equal_weight"},
+  "rebalance": {"months": [1, 7], "execution": "first_available_trading_day"},
+  "costs": {"commission_bps": 1.0, "spread_bps": 2.0, "slippage_bps": 3.0},
+  "risk_free_rate": 0.0,
+  "integrity_gates": [
+    "point_in_time_fundamentals",
+    "point_in_time_estimates",
+    "historical_universe_membership",
+    "corporate_actions_complete",
+    "delisted_securities_included",
+    "benchmark_complete",
+    "publication_timestamps_present",
+    "independent_lookahead_test_passed"
+  ]
+}

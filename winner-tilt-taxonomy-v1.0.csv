@@ -1,0 +1,58 @@
+﻿type,id,code,name,definition
+business_stage,STG-01,EMG,Emerging,Early commercialization or limited financial maturity.
+business_stage,STG-02,GRW,Growth,Scaled business with above-normal structural growth.
+business_stage,STG-03,MAT,Mature,Established business with durable scale and slower growth.
+quality_tier,QLT-01,S,World Class,Highest qualitative tier; formal rubric pending Milestone 3.
+quality_tier,QLT-02,A,Leader,Category leader with durable competitive strengths.
+quality_tier,QLT-03,B,Strong,Strong company with material limitations or cyclicality.
+quality_tier,QLT-04,C,Watchlist,"Higher uncertainty, execution risk or immature economics."
+theme,THM-001,THM_001,AI Infrastructure,Structural participation theme; separate from sector and industry.
+theme,THM-002,THM_002,AI Software,Structural participation theme; separate from sector and industry.
+theme,THM-003,THM_003,Cloud Infrastructure,Structural participation theme; separate from sector and industry.
+theme,THM-004,THM_004,Enterprise Software,Structural participation theme; separate from sector and industry.
+theme,THM-005,THM_005,Cybersecurity,Structural participation theme; separate from sector and industry.
+theme,THM-006,THM_006,Semiconductors,Structural participation theme; separate from sector and industry.
+theme,THM-007,THM_007,Semiconductor Equipment,Structural participation theme; separate from sector and industry.
+theme,THM-008,THM_008,Networking & Connectivity,Structural participation theme; separate from sector and industry.
+theme,THM-009,THM_009,Robotics & Automation,Structural participation theme; separate from sector and industry.
+theme,THM-010,THM_010,Electrification,Structural participation theme; separate from sector and industry.
+theme,THM-011,THM_011,Digital Payments,Structural participation theme; separate from sector and industry.
+theme,THM-012,THM_012,Digital Commerce,Structural participation theme; separate from sector and industry.
+theme,THM-013,THM_013,Digital Advertising,Structural participation theme; separate from sector and industry.
+theme,THM-014,THM_014,Consumer Platforms,Structural participation theme; separate from sector and industry.
+theme,THM-015,THM_015,Healthcare Innovation,Structural participation theme; separate from sector and industry.
+theme,THM-016,THM_016,Life Science Tools,Structural participation theme; separate from sector and industry.
+theme,THM-017,THM_017,Defense,Structural participation theme; separate from sector and industry.
+theme,THM-018,THM_018,Aerospace,Structural participation theme; separate from sector and industry.
+theme,THM-019,THM_019,Space,Structural participation theme; separate from sector and industry.
+theme,THM-020,THM_020,Energy Infrastructure,Structural participation theme; separate from sector and industry.
+theme,THM-021,THM_021,Clean Power,Structural participation theme; separate from sector and industry.
+theme,THM-022,THM_022,Advanced Nuclear,Structural participation theme; separate from sector and industry.
+theme,THM-023,THM_023,Mobility,Structural participation theme; separate from sector and industry.
+theme,THM-024,THM_024,Logistics,Structural participation theme; separate from sector and industry.
+theme,THM-025,THM_025,Frontier Computing,Structural participation theme; separate from sector and industry.
+economic_exposure,EXP-001,EXP_001,AI & Data-Center Capex,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-002,EXP_002,Enterprise IT Spending,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-003,EXP_003,Cloud Workload Growth,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-004,EXP_004,Digital Advertising,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-005,EXP_005,Consumer Discretionary Spending,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-006,EXP_006,Consumer Staples Demand,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-007,EXP_007,Payment Volumes,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-008,EXP_008,Interest Rates & Credit,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-009,EXP_009,Capital-Market Activity,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-010,EXP_010,Healthcare Utilization,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-011,EXP_011,Drug Pipeline Execution,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-012,EXP_012,Biopharma R&D Spending,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-013,EXP_013,Industrial Production,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-014,EXP_014,Manufacturing Capex,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-015,EXP_015,Grid & Power Demand,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-016,EXP_016,Oil & Gas Prices,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-017,EXP_017,Defense Budgets,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-018,EXP_018,Commercial Aerospace Cycle,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-019,EXP_019,Travel Demand,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-020,EXP_020,Housing & Construction,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-021,EXP_021,Global Trade & Freight,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-022,EXP_022,Commodity & Farm Income,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-023,EXP_023,Regulatory Approval & Certification,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-024,EXP_024,Crypto & Retail Trading Activity,Shared economic driver used for hidden-concentration control.
+economic_exposure,EXP-025,EXP_025,Frontier Technology Funding,Shared economic driver used for hidden-concentration control.

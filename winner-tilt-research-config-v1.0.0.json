@@ -1,0 +1,59 @@
+{
+  "configuration_version": "1.0.0",
+  "status": "FROZEN",
+  "engine_contract": {
+    "informational_only": true,
+    "may_modify_scoring": false,
+    "may_modify_portfolio": false,
+    "may_modify_backtest": false
+  },
+  "validation": {
+    "require_event_id": true,
+    "require_published_at": true,
+    "require_ingested_at": true,
+    "require_source": true,
+    "require_security_links": true,
+    "reject_future_publication_vs_cutoff": true,
+    "reject_ingested_before_published": true,
+    "minimum_confidence": 0.0,
+    "maximum_confidence": 1.0,
+    "minimum_severity": 1,
+    "maximum_severity": 5
+  },
+  "aggregation": {
+    "lookback_days": 180,
+    "half_life_days": 60,
+    "minimum_material_severity": 3,
+    "strong_signal_threshold": 1.0,
+    "context_threshold": 0.2,
+    "top_events_per_security": 5
+  },
+  "direction_values": ["POSITIVE", "NEGATIVE", "NEUTRAL", "MIXED", "UNKNOWN"],
+  "source_tiers": {
+    "PRIMARY": 1.0,
+    "REGULATORY": 1.0,
+    "EXCHANGE": 0.95,
+    "GOVERNMENT": 0.95,
+    "ESTIMATES_PROVIDER": 0.9,
+    "REPUTABLE_MEDIA": 0.75,
+    "OTHER": 0.5,
+    "UNVERIFIED": 0.25
+  },
+  "event_type_weights": {
+    "EARNINGS_RESULT": 1.0,
+    "GUIDANCE_CHANGE": 1.2,
+    "ANALYST_REVISION": 0.7,
+    "SEC_FILING": 0.8,
+    "INSIDER_TRANSACTION": 0.5,
+    "BUYBACK": 0.7,
+    "DIVIDEND_CHANGE": 0.6,
+    "M_AND_A": 1.0,
+    "MANAGEMENT_CHANGE": 0.8,
+    "PRODUCT_LAUNCH": 0.5,
+    "REGULATORY_ACTION": 1.1,
+    "CYBERSECURITY_INCIDENT": 1.1,
+    "LEGAL_EVENT": 0.9,
+    "MACRO_EVENT": 0.5,
+    "OTHER": 0.3
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "project": "Winner Tilt AI",
+  "manifest_version": "1.1",
+  "generated_at": "2026-07-23",
+  "milestone_3_status": "COMPLETE_FROZEN",
+  "files": [
+    {
+      "filename": "winner-tilt-spec-v1.1.md",
+      "sha256": "c1a50ade697f21c0d63ac3b1c31ab9c28c3ec28dd78e25796624f3084b9d95b7",
+      "bytes": 2158
+    },
+    {
+      "filename": "winner-tilt-data-model-v1.0(2).md",
+      "sha256": "a5a69fe474168fa47b4e353fdeb0a5e1736d3dc3afc4c3729d76729e9444de41",
+      "bytes": 5748
+    },
+    {
+      "filename": "winner-tilt-schema-v1.1.sql",
+      "sha256": "007fa33fd4bab6729372767320620d5be2f8c102a59e997ee2757539fd65a17a",
+      "bytes": 12023
+    },
+    {
+      "filename": "winner-tilt-taxonomy-v1.0(2).csv",
+      "sha256": "775c687b5a61964078ab7db0b197059033026d49124b4d48434e51d3dbc5c099",
+      "bytes": 6333
+    },
+    {
+      "filename": "universe-methodology-v1.0(3).md",
+      "sha256": "e458216f742f340bd8f259a9d119cffbaafe0bfb277e43447142746a1f58fabe",
+      "bytes": 2043
+    },
+    {
+      "filename": "universe-v1.0(4).csv",
+      "sha256": "096fbd110cc0f8232351f99a9e10db00862c95ef70809becf477f3b3afb89782",
+      "bytes": 26668
+    },
+    {
+      "filename": "data-sources-v1.0(3).md",
+      "sha256": "2f69b56c056540a0df5e93095d7dcbf28cf9ca7779026cf25ce1b8ee149926ec",
+      "bytes": 1816
+    },
+    {
+      "filename": "winner-tilt-scoring-engine-v1.0-frozen.md",
+      "sha256": "b6f0c199daa70aeaa38591aa5ac00d423b9d1c0fe7365fb41cb3fc7c66b5b5c7",
+      "bytes": 20482
+    },
+    {
+      "filename": "winner-tilt-metric-registry-v1.0.csv",
+      "sha256": "dd874def22af4b7679b423f687902989365d78146c996945aada31c0e0344199",
+      "bytes": 5529
+    },
+    {
+      "filename": "winner-tilt-load-metric-registry-v1.0.sql",
+      "sha256": "4d0a568d6fb816a7e74a235afdc416d02161401e867121ba6ca466ea8211f404",
+      "bytes": 6850
+    },
+    {
+      "filename": "winner-tilt-scoring-config-v1.0.0.json",
+      "sha256": "d9c353cb60464ec7762cecb87cd5349b5db2ce402cacb337d68dcf640a46d9e5",
+      "bytes": 19499
+    },
+    {
+      "filename": "winner_tilt_scoring_engine_v1.py",
+      "sha256": "0ac0dae447b3974c63941e9ea905135d7f1f81dc710c1b790034f412df38efe9",
+      "bytes": 8857
+    },
+    {
+      "filename": "test_winner_tilt_scoring_engine_v1.py",
+      "sha256": "584aba1f84a1c9f32ba7b2513ad68d2ad1981bb4a959a31673dde965d6f95df0",
+      "bytes": 2841
+    },
+    {
+      "filename": "winner-tilt-business-model-modules-v1.0.csv",
+      "sha256": "364e1516a1282bd840fbe741569967cd08a18a66e232327ef93d67d438d18cc3",
+      "bytes": 7527
+    },
+    {
+      "filename": "winner-tilt-synthetic-observations-v1.0.csv",
+      "sha256": "28e850bbde0f9446d74419446415ce3732b6c9d5d3be63b72e12f1c9caa12707",
+      "bytes": 277390
+    },
+    {
+      "filename": "winner-tilt-prototype-score-run-v1.0.json",
+      "sha256": "588e02dcb12f6b18987f7fada0c91db319c51e6e5c90096dac8cb5342580f2ca",
+      "bytes": 1838718
+    },
+    {
+      "filename": "winner-tilt-m3-test-results-v1.0.txt",
+      "sha256": "c5d6a07713328795a8c3a6e8268aade9a007681860b8f19fd739aaca4a55b4ac",
+      "bytes": 1427
+    },
+    {
+      "filename": "winner-tilt-m3-completion-report-v1.0.md",
+      "sha256": "b2bbf158bff3d8b55981e064357f3079cfe0466d423bcb086c3a4412d3fb7132",
+      "bytes": 1887
+    },
+    {
+      "filename": "winner-tilt-project-file-audit-m3.md",
+      "sha256": "65a693ee6bf09f9d7624492279ec42bf65e0608162e1b0574b68be3564c1a5bd",
+      "bytes": 1799
+    }
+  ]
+}

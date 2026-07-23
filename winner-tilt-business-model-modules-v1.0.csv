@@ -1,0 +1,97 @@
+WT_ID,Ticker,Business_Model_Module,Production_Supported,Reason
+WT-0001,MSFT,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0002,AMZN,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0003,GOOGL,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0004,META,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0005,AAPL,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0006,ORCL,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0007,CRM,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0008,NOW,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0009,IBM,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0010,NVDA,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0011,AVGO,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0012,AMD,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0013,TSM,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0014,ASML,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0015,MU,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0016,QCOM,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0017,AMAT,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0018,LRCX,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0019,KLAC,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0020,ARM,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0021,MRVL,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0022,ADI,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0023,TXN,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0024,PANW,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0025,CRWD,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0026,FTNT,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0027,PLTR,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0028,SNOW,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0029,DDOG,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0030,NET,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0031,ZS,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0032,RBRK,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0033,S,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0034,LLY,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0035,UNH,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0036,ABBV,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0037,ISRG,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0038,TMO,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0039,DHR,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0040,VRTX,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0041,REGN,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0042,HIMS,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0043,RXRX,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0044,JPM,BANK,FALSE,Specialized bank module required before production ranking.
+WT-0045,GS,BANK,FALSE,Specialized bank module required before production ranking.
+WT-0046,BRK.B,INSURER_CONGLOMERATE,FALSE,Specialized insurer/conglomerate module required before production ranking.
+WT-0047,V,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0048,MA,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0049,SPGI,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0050,HOOD,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0051,SOFI,FINTECH_LENDER,FALSE,Specialized lender module required before production ranking.
+WT-0052,ETN,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0053,PH,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0054,ROK,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0055,HON,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0056,CAT,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0057,DE,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0058,PWR,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0059,SYM,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0060,GE,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0061,RTX,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0062,LMT,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0063,NOC,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0064,TDG,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0065,RKLB,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0066,ASTS,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0067,ACHR,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0068,XOM,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0069,CVX,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0070,COP,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0071,NEE,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0072,CEG,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0073,VST,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0074,WMB,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0075,OKLO,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0076,COST,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0077,WMT,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0078,HD,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0079,MELI,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0080,BKNG,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0081,CMG,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0082,DUOL,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0083,CAVA,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0084,NFLX,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0085,SPOT,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0086,TTD,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0087,DIS,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0088,RDDT,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0089,UBER,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0090,FDX,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0091,UPS,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0092,JOBY,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
+WT-0093,TSLA,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0094,FSLR,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0095,AXON,STANDARD_CORPORATE,TRUE,Standard corporate scoring module.
+WT-0096,IONQ,PRE_PROFIT,TRUE,Standard metrics plus mandatory cash-runway rule when FCF is negative.
