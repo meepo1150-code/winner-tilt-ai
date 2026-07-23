@@ -1,27 +1,24 @@
-# Winner Tilt AI Milestone 9 Completion Report v1.0
+# Winner Tilt AI Milestone 9 Architecture Report v1.0
 
 Generated: 2026-07-23
 
-## Milestone
-
-`milestone-9/production-data-integration`
-
 ## Status
 
-Complete. Milestone 9 adds an ingest-only production data integration validation layer that fails closed on invalid production snapshots while preserving non-interference with frozen scoring, portfolio, backtest, research, and dashboard behavior.
+`PRODUCTION_INTEGRATION_ARCHITECTURE_COMPLETE_LIVE_INTEGRATIONS_PENDING`
 
-## Delivered artifacts
+PR #7 delivered an ingest-only validator in `src/winner_tilt/data_integration.py`, tests, limited documentation, a package version update, manifest changes, and this report. That was a foundation, not a complete live production data integration.
 
-- `src/winner_tilt/data_integration.py` implements deterministic production snapshot validation for universe, metrics, and event rows.
-- `tests/test_winner_tilt_data_integration.py` covers valid snapshots, point-in-time cutoff rejection, unknown securities, duplicate natural keys, and deterministic hashing.
-- `docs/winner-tilt-production-data-integration-v1.0.md` documents the integration contract, validation controls, output contract, and non-interference policy.
-- `README.md` documents the Milestone 9 CLI usage and production data integration scope.
+This continuation adds offline deterministic provider abstractions, validation architecture, immutable snapshots, scheduler orchestration, health checks, structured operational logging, production configuration, documentation, and tests while retaining the PR #7 validator.
 
-## Validation results
+## Explicit limitations
 
-- `python -m compileall -q src tests` passed.
-- `python -m pytest -q` passed 50 tests.
+- Live provider integrations are not included.
+- Real credentials are not included.
+- Licensed production datasets are not included.
+- Real production operation is pending.
+- Synthetic fixtures are not investment evidence.
+- Real-world investment performance validation remains pending.
 
 ## Non-interference attestation
 
-The production data integration layer does not fetch network data, alter scoring, construct portfolios, run backtests, modify research outputs, allocate DCA, or change dashboard behavior. It only validates externally supplied snapshots and emits deterministic audit reports.
+Milestone 9 additions are production infrastructure only. They do not change universe methodology, scoring formulas, portfolio construction, backtest logic, research signal semantics, Decision Journal hashing/validation semantics, or dashboard business logic/write behavior.
