@@ -1,11 +1,11 @@
 import argparse,copy,json,tempfile,unittest
 from pathlib import Path
-import winner_tilt_portfolio_engine_v1 as eng
+from winner_tilt import portfolio as eng
 
-BASE=Path('/mnt/data')
-CFG=json.loads((BASE/'winner-tilt-portfolio-config-v1.0.0.json').read_text())
-SCORES=json.loads((BASE/'winner-tilt-prototype-score-run-v1.0(1).json').read_text())
-UNI=eng.load_universe(str(BASE/'universe-v1.0(5).csv'))
+BASE=Path(__file__).resolve().parents[1]
+CFG=json.loads((BASE/'config'/'winner-tilt-portfolio-config-v1.0.0.json').read_text())
+SCORES=json.loads((BASE/'reports'/'winner-tilt-prototype-score-run-v1.0.json').read_text())
+UNI=eng.load_universe(str(BASE/'database'/'universe-v1.0.csv'))
 
 class PortfolioEngineTests(unittest.TestCase):
  def candidates(self): return eng.candidate_rows(SCORES,UNI)
@@ -32,7 +32,7 @@ class PortfolioEngineTests(unittest.TestCase):
  def test_turnover_cap(self):
   c=self.candidates(); old_ids=[x['security_id'] for x in c[15:30]]; previous={'holdings':[{'security_id':x} for x in old_ids]}; selected,_=eng.select(c,15,CFG); revised=eng.enforce_turnover(previous,selected,c,CFG); exits=len(set(old_ids)-{x['security_id'] for x in revised}); self.assertLessEqual(exits,6)
  def test_build_contains_decisions_and_dca(self):
-  args=argparse.Namespace(config=str(BASE/'winner-tilt-portfolio-config-v1.0.0.json'),universe=str(BASE/'universe-v1.0(5).csv'),scores=str(BASE/'winner-tilt-prototype-score-run-v1.0(1).json'),output='x',previous=None,as_of_date='2026-07-23',rebalance=True)
+  args=argparse.Namespace(config=str(BASE/'config'/'winner-tilt-portfolio-config-v1.0.0.json'),universe=str(BASE/'database'/'universe-v1.0.csv'),scores=str(BASE/'reports'/'winner-tilt-prototype-score-run-v1.0.json'),output='x',previous=None,as_of_date='2026-07-23',rebalance=True)
   out=eng.build(args); self.assertEqual(len(out['holdings']),15); self.assertEqual(len(out['reserves']),15); self.assertAlmostEqual(sum(out['dca_allocation'].values()),1.0,8); self.assertTrue(all(x['decision']=='BUY' for x in out['holdings']))
  def test_config_hash_is_stable(self):
   d=copy.deepcopy(CFG); expected=d.pop('configuration_sha256'); self.assertEqual(expected,eng.canonical_hash(d))

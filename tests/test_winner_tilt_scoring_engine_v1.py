@@ -1,6 +1,4 @@
-import importlib.util, pathlib
-P=pathlib.Path('/mnt/data/winner_tilt_scoring_engine_v1.py')
-spec=importlib.util.spec_from_file_location('engine',P); e=importlib.util.module_from_spec(spec); spec.loader.exec_module(e)
+from winner_tilt import scoring as e
 
 def test_percentile_direction():
     vals=[1,2,3,4,5]
