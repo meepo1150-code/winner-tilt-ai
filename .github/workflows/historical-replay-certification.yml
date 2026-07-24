@@ -1,0 +1,113 @@
+name: Historical Replay Certification
+
+on:
+  workflow_dispatch:
+    inputs:
+      authorization:
+        description: Explicit research-only historical replay authorization
+        required: true
+        type: choice
+        options:
+          - AUTHORIZE_HISTORICAL_REPLAY_RESEARCH_ONLY
+
+permissions:
+  contents: read
+
+jobs:
+  historical-replay-certification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Verify canonical repository inputs
+        shell: bash
+        run: |
+          test -f database/universe-v1.0.csv
+          test -f config/winner-tilt-portfolio-config-v1.0.0.json
+
+      - name: Build deterministic certified replay fixtures
+        shell: bash
+        run: |
+          mkdir -p artifacts/historical-replay/vintages/2025
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("artifacts/historical-replay/vintages/2025")
+          periods = [
+              ("2025-01-31T00:00:00Z", 30),
+              ("2025-02-28T00:00:00Z", 12),
+              ("2025-03-31T00:00:00Z", 30),
+          ]
+          for month, (cutoff, eligible_count) in enumerate(periods, start=1):
+              results = []
+              for index in range(30):
+                  eligible = index < eligible_count
+                  results.append({
+                      "security_id": f"WT-{index + 1:04d}",
+                      "eligible": eligible,
+                      "total_score": float(100 - index) if eligible else None,
+                      "overall_rank": index + 1 if eligible else None,
+                      "available_at": cutoff,
+                  })
+              payload = {"vintages": [{
+                  "information_cutoff": cutoff,
+                  "generated_at": cutoff,
+                  "certification": {"status": "CERTIFIED"},
+                  "results": results,
+                  "lineage": {"pipeline_version": "m20-fixture"},
+              }]}
+              (root / f"vintage-{month:02d}.json").write_text(
+                  json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+              )
+          PY
+
+      - name: Certify historical replay and walk-forward periods
+        shell: bash
+        run: |
+          mkdir -p artifacts/historical-replay/output
+          set +e
+          python -m winner_tilt.historical_replay \
+            --vintages artifacts/historical-replay/vintages \
+            --portfolio-config config/winner-tilt-portfolio-config-v1.0.0.json \
+            --authorization "${{ inputs.authorization }}" \
+            --output artifacts/historical-replay/output/historical-replay-manifest.json \
+            2>&1 | tee artifacts/historical-replay/output/historical-replay-output.log
+          status=${PIPESTATUS[0]}
+          set -e
+          exit "$status"
+
+      - name: Verify certified replay artifact
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("artifacts/historical-replay/output/historical-replay-manifest.json")
+          payload = json.loads(path.read_text(encoding="utf-8"))
+          assert payload["status"] == "CERTIFIED_HISTORICAL_REPLAY_RESEARCH_ONLY"
+          assert payload["period_count"] == 3
+          assert payload["portfolio_ready_period_count"] == 2
+          assert payload["insufficient_coverage_period_count"] == 1
+          assert all(value is False for value in payload["execution_boundary"].values())
+          assert len(payload["manifest_sha256"]) == 64
+          PY
+
+      - name: Upload historical replay certification artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: historical-replay-certification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/historical-replay/
+          if-no-files-found: error
+          retention-days: 30
