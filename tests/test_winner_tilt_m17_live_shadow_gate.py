@@ -46,16 +46,31 @@ def test_unregistered_cik_fails_closed(tmp_path):
         )
 
 
-def test_single_snapshot_is_required(tmp_path):
+def test_single_snapshot_is_required_and_discovered_recursively(tmp_path):
     directory = tmp_path / "snapshots"
     directory.mkdir()
     with pytest.raises(LiveShadowGateError, match="LIVE_SHADOW_SINGLE_SNAPSHOT_REQUIRED"):
         select_single_snapshot(directory)
-    (directory / "one.json").write_text("{}", encoding="utf-8")
-    assert select_single_snapshot(directory).name == "one.json"
-    (directory / "two.json").write_text("{}", encoding="utf-8")
+
+    nested = directory / "20260724T050000Z"
+    nested.mkdir()
+    snapshot = nested / "CIK0000320193.json"
+    snapshot.write_text("{}", encoding="utf-8")
+    (nested / "metadata.json").write_text("{}", encoding="utf-8")
+
+    assert select_single_snapshot(directory) == snapshot
+
+    second_run = directory / "20260724T060000Z"
+    second_run.mkdir()
+    (second_run / "CIK0000320193.json").write_text("{}", encoding="utf-8")
     with pytest.raises(LiveShadowGateError, match="LIVE_SHADOW_SINGLE_SNAPSHOT_REQUIRED"):
         select_single_snapshot(directory)
+
+
+def test_authorized_workflow_uses_recursive_cik_snapshot_lookup():
+    workflow = Path(".github/workflows/authorized-live-sec-shadow.yml").read_text(encoding="utf-8")
+    assert "find runtime/live-sec -type f -name 'CIK*.json'" in workflow
+    assert "find runtime/live-sec -maxdepth 1" not in workflow
 
 
 def test_bundle_certification_hashes_artifacts_and_preserves_execution_boundary(tmp_path):

@@ -72,9 +72,10 @@ jobs:
         id: snapshot
         shell: bash
         run: |
-          mapfile -t files < <(find runtime/live-sec -maxdepth 1 -type f -name '*.json' | sort)
+          mapfile -t files < <(find runtime/live-sec -type f -name 'CIK*.json' | sort)
           if [ "${#files[@]}" -ne 1 ]; then
             echo "Expected exactly one immutable SEC snapshot; found ${#files[@]}"
+            find runtime/live-sec -maxdepth 3 -type f -print || true
             exit 1
           fi
           echo "path=${files[0]}" >> "$GITHUB_OUTPUT"
