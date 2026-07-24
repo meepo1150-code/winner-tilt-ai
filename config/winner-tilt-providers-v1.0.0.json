@@ -4,7 +4,8 @@
   "live_integrations_enabled": false,
   "environment_placeholders": [
     "${WINNER_TILT_VENDOR_API_KEY}",
-    "${WINNER_TILT_VENDOR_ENDPOINT}"
+    "${WINNER_TILT_VENDOR_ENDPOINT}",
+    "${WINNER_TILT_SEC_USER_AGENT}"
   ],
   "providers": [
     {
@@ -20,6 +21,13 @@
       "vendor": "Winner Tilt Synthetic",
       "enabled": true,
       "credential_env_var": "${WINNER_TILT_VENDOR_API_KEY}"
+    },
+    {
+      "dataset_type": "fundamentals",
+      "provider_id": "sec-edgar-companyfacts",
+      "vendor": "U.S. Securities and Exchange Commission",
+      "enabled": false,
+      "credential_env_var": "${WINNER_TILT_SEC_USER_AGENT}"
     },
     {
       "dataset_type": "estimates",

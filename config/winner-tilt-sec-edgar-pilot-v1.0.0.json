@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0.0",
+  "config_version": "1.0.0",
+  "provider_id": "sec-edgar-companyfacts",
+  "dataset_type": "fundamentals",
+  "live_enabled": false,
+  "allowlisted_ciks": [
+    "0000320193"
+  ],
+  "user_agent_env_var": "WINNER_TILT_SEC_USER_AGENT",
+  "max_requests_per_second": 2.0,
+  "retain_raw_payload": false,
+  "offline_tests_only": true,
+  "downstream_consumption_enabled": false,
+  "approved_forms": [
+    "10-K",
+    "10-K/A",
+    "10-Q",
+    "10-Q/A"
+  ],
+  "rollback_mode": "disable_provider_and_quarantine_snapshots"
+}
