@@ -89,7 +89,7 @@ jobs:
             --feature-definitions config/winner-tilt-sec-fundamental-features-v1.0.0.json \
             --scoring-config config/winner-tilt-scoring-config-v1.0.0.json \
             --portfolio-config config/winner-tilt-portfolio-config-v1.0.0.json \
-            --universe data/universe-v1.0.csv \
+            --universe database/universe-v1.0.csv \
             --output-dir artifacts/live-shadow/runs \
             --information-cutoff "${{ inputs.information_cutoff }}" \
             --as-of-date "${{ inputs.as_of_date }}" \
