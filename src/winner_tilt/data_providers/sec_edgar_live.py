@@ -24,6 +24,15 @@ class SecEdgarTransportError(RuntimeError):
     """Raised when the bounded HTTPS transport fails closed."""
 
 
+def _first_nonempty(values: Mapping[str, str], *names: str, default: str = "") -> str:
+    """Return the first configured environment value from canonical name or alias."""
+    for name in names:
+        value = values.get(name, "").strip()
+        if value:
+            return value
+    return default
+
+
 @dataclass(frozen=True)
 class SecEdgarLiveRuntimeConfig:
     enabled: bool
@@ -41,7 +50,21 @@ class SecEdgarLiveRuntimeConfig:
         values = os.environ if env is None else env
         enabled = values.get("WINNER_TILT_SEC_EDGAR_LIVE_ENABLED", "false").strip().lower() == "true"
         kill_switch = values.get("WINNER_TILT_SEC_EDGAR_KILL_SWITCH", "false").strip().lower() == "true"
-        ciks = tuple(item.strip() for item in values.get("WINNER_TILT_SEC_EDGAR_CIKS", "").split(",") if item.strip())
+
+        cik_value = _first_nonempty(
+            values,
+            "WINNER_TILT_SEC_EDGAR_CIKS",
+            "WINNER_TILT_SEC_EDGAR_ALLOWED_CIKS",
+        )
+        ciks = tuple(item.strip() for item in cik_value.split(",") if item.strip())
+
+        max_total_requests_value = _first_nonempty(
+            values,
+            "WINNER_TILT_SEC_EDGAR_MAX_TOTAL_REQUESTS",
+            "WINNER_TILT_SEC_EDGAR_MAX_REQUESTS",
+            default="3",
+        )
+
         config = cls(
             enabled=enabled,
             user_agent=values.get("WINNER_TILT_SEC_EDGAR_USER_AGENT", "").strip(),
@@ -50,7 +73,7 @@ class SecEdgarLiveRuntimeConfig:
             max_attempts=int(values.get("WINNER_TILT_SEC_EDGAR_MAX_ATTEMPTS", "3")),
             backoff_seconds=float(values.get("WINNER_TILT_SEC_EDGAR_BACKOFF_SECONDS", "0.5")),
             max_requests_per_second=float(values.get("WINNER_TILT_SEC_EDGAR_MAX_RPS", "2")),
-            max_total_requests=int(values.get("WINNER_TILT_SEC_EDGAR_MAX_TOTAL_REQUESTS", "3")),
+            max_total_requests=int(max_total_requests_value),
             kill_switch=kill_switch,
         )
         config.validate()
