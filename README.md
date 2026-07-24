@@ -89,6 +89,23 @@ python -m winner_tilt.data_integration \
 
 ## Production Integration Architecture Status
 
-Milestone 9 now provides deterministic, offline production-integration architecture: versioned provider contracts, fail-closed validation, immutable snapshot management, dependency-injected scheduling, health checks, structured operational logging, and production-oriented configuration. Status: `PRODUCTION_INTEGRATION_ARCHITECTURE_COMPLETE_LIVE_INTEGRATIONS_PENDING`.
+Milestone 9 provides deterministic, offline production-integration architecture: versioned provider contracts, fail-closed validation, immutable snapshot management, dependency-injected scheduling, health checks, structured operational logging, and production-oriented configuration.
 
-This repository still does not include live vendor integrations, real credentials, licensed production datasets, real production operation, or investment performance evidence. Synthetic fixtures and deterministic tests are architecture validation only, not investment evidence.
+Milestones 10 and 11 add a bounded SEC EDGAR Company Facts adapter and successful manually dispatched live-ingest pilot. The pilot remains allowlisted, ingest-focused, and is not investment-performance evidence.
+
+## Fundamental Feature Integration
+
+Milestone 12 adds `winner_tilt.fundamental_features`, a deterministic point-in-time bridge from normalized SEC Company Facts to the existing long-form scoring observation contract. It supports latest-value, comparable-period growth, and same-period ratio features, preserves fact/accession lineage, exposes scoring-compatible CSV output, and emits score-vintage metadata for the existing backtest cutoff gate.
+
+```bash
+python -m winner_tilt.fundamental_features \
+  --facts reports/sec-edgar-live-pilot.json \
+  --definitions config/winner-tilt-sec-fundamental-features-v1.0.0.json \
+  --information-cutoff 2026-07-24T00:00:00Z \
+  --output reports/fundamental-features.json \
+  --scoring-csv reports/fundamental-observations.csv
+```
+
+The contract, point-in-time rules, amendment behavior, limitations, and acceptance criteria are documented in `docs/winner-tilt-fundamental-feature-integration-v1.0.md`.
+
+This repository still does not include broad live-provider coverage, licensed production datasets, real production operation, or investment performance evidence. Synthetic fixtures and deterministic tests are architecture validation only, not investment evidence.
