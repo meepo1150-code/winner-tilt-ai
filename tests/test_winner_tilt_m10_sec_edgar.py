@@ -88,7 +88,7 @@ def test_same_accession_and_end_with_different_contexts_are_distinct():
     payload["facts"]["us-gaap"]["Assets"]["units"]["USD"].append(contextual_variant)
     rows = normalize_companyfacts(payload, expected_cik="320193")
     assert len(rows) == 3
-    assert {row["period_start"] for row in rows} >= {None, "2025-09-28"}
+    assert {row["period_start"] for row in rows} >= {"2025-09-28", "2025-09-29"}
 
 
 def test_conflicting_fact_for_same_context_fails_closed():
