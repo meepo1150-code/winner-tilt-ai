@@ -84,7 +84,7 @@ def build_shadow_journal_record(*, shadow_path: str | Path, vintage_path: str | 
     if not isinstance(as_of_date, str) or len(as_of_date) != 10:
         raise ShadowAuditError("SHADOW_AUDIT_INVALID_AS_OF_DATE")
     portfolio = shadow["portfolio"]
-    record = construct_record(
+    return construct_record(
         decision_type="semiannual_rebalance",
         run_id=run_id,
         decision_timestamp_utc=decision_timestamp_utc,
@@ -96,7 +96,7 @@ def build_shadow_journal_record(*, shadow_path: str | Path, vintage_path: str | 
         source_snapshot_identifiers={"shadow_output_sha256": shadow.get("output_sha256"), "certified_vintage_sha256": shadow["lineage"]["certified_vintage_sha256"]},
         universe_snapshot_ref=file_ref(universe_rel, root=root_path, snapshot_timestamp_utc=cutoff),
         score_run_ref=file_ref(vintage_rel, root=root_path, run_id=run_id, snapshot_timestamp_utc=cutoff),
-        portfolio_run_ref=file_ref(shadow_rel, root=root_path, run_id=run_id, snapshot_timestamp_utc=decision_timestamp_utc),
+        portfolio_run_ref=file_ref(shadow_rel, root=root_path, run_id=run_id, snapshot_timestamp_utc=cutoff),
         score_run=vintage,
         portfolio_run=portfolio,
         validation_status="SHADOW_CERTIFIED_RESEARCH_ONLY",
@@ -104,7 +104,6 @@ def build_shadow_journal_record(*, shadow_path: str | Path, vintage_path: str | 
         warnings=["Shadow portfolio audit only; no broker, order, automatic DCA, or automatic exit action is enabled."],
         rationale_evidence_refs=[{"path": str(shadow_rel), "sha256": _hash_bytes(root_path / shadow_rel)}],
     )
-    return record
 
 
 def append_shadow_journal_record(*, journal_path: str | Path, record: Mapping[str, Any]) -> None:
