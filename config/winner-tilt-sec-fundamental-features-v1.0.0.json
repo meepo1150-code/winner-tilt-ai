@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "feature_engine_version": "1.0.0",
+  "features": [
+    {
+      "metric_id": "TOTAL_ASSETS",
+      "operation": "latest",
+      "numerator_concepts": ["Assets"],
+      "unit": "USD",
+      "forms": ["10-K", "10-K/A", "10-Q", "10-Q/A"],
+      "stale_after_days": 550
+    },
+    {
+      "metric_id": "REVENUE_GROWTH",
+      "operation": "growth",
+      "numerator_concepts": ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", "SalesRevenueNet"],
+      "unit": "USD",
+      "forms": ["10-K", "10-K/A", "10-Q", "10-Q/A"],
+      "stale_after_days": 550,
+      "scale": 100.0
+    },
+    {
+      "metric_id": "NET_MARGIN",
+      "operation": "ratio",
+      "numerator_concepts": ["NetIncomeLoss", "ProfitLoss"],
+      "denominator_concepts": ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", "SalesRevenueNet"],
+      "unit": "USD",
+      "forms": ["10-K", "10-K/A", "10-Q", "10-Q/A"],
+      "stale_after_days": 550,
+      "scale": 100.0
+    },
+    {
+      "metric_id": "DEBT_TO_ASSETS",
+      "operation": "ratio",
+      "numerator_concepts": ["Liabilities"],
+      "denominator_concepts": ["Assets"],
+      "unit": "USD",
+      "forms": ["10-K", "10-K/A", "10-Q", "10-Q/A"],
+      "stale_after_days": 550
+    },
+    {
+      "metric_id": "OPERATING_CASH_FLOW_GROWTH",
+      "operation": "growth",
+      "numerator_concepts": ["NetCashProvidedByUsedInOperatingActivities"],
+      "unit": "USD",
+      "forms": ["10-K", "10-K/A", "10-Q", "10-Q/A"],
+      "stale_after_days": 550,
+      "scale": 100.0
+    }
+  ],
+  "policy": {
+    "information_availability": "accepted_timestamp_lte_information_cutoff",
+    "amendments": "latest_publication_wins",
+    "missing_history": "TEMPORARILY_UNAVAILABLE",
+    "zero_denominator": "fail_closed",
+    "downstream_business_logic": "unchanged"
+  }
+}
