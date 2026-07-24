@@ -1,0 +1,116 @@
+name: Authorized Live SEC Shadow Pilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      cik:
+        description: SEC CIK approved in the identifier registry
+        required: true
+        default: "0000320193"
+      authorization:
+        description: Type AUTHORIZE_LIVE_SEC_SHADOW_RESEARCH_ONLY
+        required: true
+      information_cutoff:
+        description: ISO-8601 UTC cutoff after the live acquisition
+        required: true
+      as_of_date:
+        description: Portfolio as-of date (YYYY-MM-DD)
+        required: true
+      decision_timestamp:
+        description: ISO-8601 UTC audit timestamp
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  authorized-live-shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      WINNER_TILT_SEC_EDGAR_LIVE_ENABLED: "true"
+      WINNER_TILT_SEC_EDGAR_USER_AGENT: ${{ secrets.SEC_EDGAR_USER_AGENT }}
+      WINNER_TILT_SEC_EDGAR_ALLOWED_CIKS: ${{ inputs.cik }}
+      WINNER_TILT_SEC_EDGAR_MAX_REQUESTS: "1"
+      WINNER_TILT_SEC_EDGAR_KILL_SWITCH: "false"
+      RUN_ID: live-shadow-${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Verify SEC identity secret
+        shell: bash
+        run: |
+          if [ -z "$WINNER_TILT_SEC_EDGAR_USER_AGENT" ]; then
+            echo "SEC_EDGAR_USER_AGENT secret is missing"
+            exit 1
+          fi
+
+      - name: Validate explicit live authorization
+        run: |
+          mkdir -p artifacts/live-shadow
+          python -m winner_tilt.live_shadow_gate validate \
+            --cik "${{ inputs.cik }}" \
+            --authorization "${{ inputs.authorization }}" \
+            --identifier-registry config/winner-tilt-security-identifiers-v1.0.0.csv \
+            --output artifacts/live-shadow/authorization-gate.json
+
+      - name: Run bounded SEC EDGAR live ingest
+        run: |
+          python -m winner_tilt.sec_edgar_pilot --snapshot-dir runtime/live-sec
+
+      - name: Resolve immutable snapshot path
+        id: snapshot
+        shell: bash
+        run: |
+          mapfile -t files < <(find runtime/live-sec -maxdepth 1 -type f -name '*.json' | sort)
+          if [ "${#files[@]}" -ne 1 ]; then
+            echo "Expected exactly one immutable SEC snapshot; found ${#files[@]}"
+            exit 1
+          fi
+          echo "path=${files[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Run certified end-to-end shadow pipeline
+        run: |
+          python -m winner_tilt.shadow_pilot \
+            --root . \
+            --snapshot "${{ steps.snapshot.outputs.path }}" \
+            --identifier-registry config/winner-tilt-security-identifiers-v1.0.0.csv \
+            --feature-definitions config/winner-tilt-sec-fundamental-features-v1.0.0.json \
+            --scoring-config config/winner-tilt-scoring-config-v1.0.0.json \
+            --portfolio-config config/winner-tilt-portfolio-config-v1.0.0.json \
+            --universe data/universe-v1.0.csv \
+            --output-dir artifacts/live-shadow/runs \
+            --information-cutoff "${{ inputs.information_cutoff }}" \
+            --as-of-date "${{ inputs.as_of_date }}" \
+            --decision-timestamp "${{ inputs.decision_timestamp }}" \
+            --run-id "$RUN_ID"
+
+      - name: Certify live artifact bundle
+        run: |
+          python -m winner_tilt.live_shadow_gate finalize \
+            --gate artifacts/live-shadow/authorization-gate.json \
+            --snapshot-dir runtime/live-sec \
+            --shadow-manifest "artifacts/live-shadow/runs/$RUN_ID/run-manifest.json" \
+            --output artifacts/live-shadow/authorized-live-run-manifest.json
+
+      - name: Copy immutable live snapshot into artifact bundle
+        run: cp "${{ steps.snapshot.outputs.path }}" artifacts/live-shadow/sec-companyfacts-snapshot.json
+
+      - name: Upload authorized live shadow artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: authorized-live-sec-shadow-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/live-shadow/
+          if-no-files-found: error
+          retention-days: 30
