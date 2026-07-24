@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-ENGINE_VERSION = "1.0.0"
+ENGINE_VERSION = "1.0.1"
 
 
 class ShadowPortfolioError(ValueError):
@@ -35,6 +35,40 @@ def _parse_utc(value: Any, code: str) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
+def _validate_lineage(value: Any) -> None:
+    """Accept the M13 named-hash mapping and the legacy list representation."""
+    if isinstance(value, Mapping):
+        if not value:
+            raise ShadowPortfolioError("SHADOW_PORTFOLIO_LINEAGE_REQUIRED")
+        required = {
+            "pipeline_version",
+            "snapshot_file_sha256",
+            "snapshot_payload_sha256",
+            "raw_content_sha256",
+            "identifier_registry_sha256",
+            "feature_definitions_sha256",
+            "fundamental_feature_output_sha256",
+            "scoring_config_sha256",
+            "universe_sha256",
+            "scoring_output_sha256",
+        }
+        if not required.issubset(value):
+            raise ShadowPortfolioError("SHADOW_PORTFOLIO_LINEAGE_INCOMPLETE")
+        for key in required - {"pipeline_version"}:
+            item = value.get(key)
+            if not isinstance(item, str) or len(item) != 64:
+                raise ShadowPortfolioError("SHADOW_PORTFOLIO_LINEAGE_HASH_INVALID")
+        if not isinstance(value.get("pipeline_version"), str) or not value["pipeline_version"]:
+            raise ShadowPortfolioError("SHADOW_PORTFOLIO_LINEAGE_VERSION_INVALID")
+        return
+    if isinstance(value, list) and value:
+        for item in value:
+            if not isinstance(item, Mapping) or not item.get("name") or not item.get("sha256"):
+                raise ShadowPortfolioError("SHADOW_PORTFOLIO_LINEAGE_INVALID")
+        return
+    raise ShadowPortfolioError("SHADOW_PORTFOLIO_LINEAGE_REQUIRED")
+
+
 def certify_vintage(payload: Mapping[str, Any], *, as_of_date: str) -> dict[str, Any]:
     vintages = payload.get("vintages")
     if not isinstance(vintages, list) or len(vintages) != 1:
@@ -47,9 +81,7 @@ def certify_vintage(payload: Mapping[str, Any], *, as_of_date: str) -> dict[str,
     as_of = _parse_utc(f"{as_of_date}T23:59:59Z", "SHADOW_PORTFOLIO_INVALID_AS_OF_DATE")
     if cutoff > as_of:
         raise ShadowPortfolioError("SHADOW_PORTFOLIO_FUTURE_CUTOFF")
-    lineage = vintage.get("lineage")
-    if not isinstance(lineage, list) or not lineage:
-        raise ShadowPortfolioError("SHADOW_PORTFOLIO_LINEAGE_REQUIRED")
+    _validate_lineage(vintage.get("lineage"))
     results = vintage.get("results")
     if not isinstance(results, list) or not results:
         raise ShadowPortfolioError("SHADOW_PORTFOLIO_RESULTS_REQUIRED")
@@ -70,7 +102,12 @@ def certify_vintage(payload: Mapping[str, Any], *, as_of_date: str) -> dict[str,
             ranks.append(rank)
     if len(ranks) != len(set(ranks)):
         raise ShadowPortfolioError("SHADOW_PORTFOLIO_DUPLICATE_RANK")
-    return {"status": "CERTIFIED", "cutoff": vintage["information_cutoff"], "result_count": len(results), "vintage_sha256": _hash(vintage)}
+    return {
+        "status": "CERTIFIED",
+        "cutoff": vintage["information_cutoff"],
+        "result_count": len(results),
+        "vintage_sha256": _hash(vintage),
+    }
 
 
 def _validate_output(output: Mapping[str, Any], cfg: Mapping[str, Any]) -> None:
@@ -88,21 +125,45 @@ def _validate_output(output: Mapping[str, Any], cfg: Mapping[str, Any]) -> None:
         raise ShadowPortfolioError("SHADOW_PORTFOLIO_WEIGHT_CONTRACT_FAILED")
 
 
-def run_shadow_portfolio(*, vintage_path: str | Path, portfolio_config_path: str | Path,
-                         universe_path: str | Path, as_of_date: str,
-                         previous_path: str | Path | None = None) -> dict[str, Any]:
+def run_shadow_portfolio(
+    *,
+    vintage_path: str | Path,
+    portfolio_config_path: str | Path,
+    universe_path: str | Path,
+    as_of_date: str,
+    previous_path: str | Path | None = None,
+) -> dict[str, Any]:
     vintage_payload = json.loads(Path(vintage_path).read_text(encoding="utf-8"))
     config = json.loads(Path(portfolio_config_path).read_text(encoding="utf-8"))
     certification = certify_vintage(vintage_payload, as_of_date=as_of_date)
     vintage = vintage_payload["vintages"][0]
-    scoring_run = {"configuration_sha256": vintage.get("scoring_configuration_sha256"), "results": vintage["results"]}
+    lineage = vintage.get("lineage")
+    scoring_configuration_sha256 = vintage.get("scoring_configuration_sha256")
+    if scoring_configuration_sha256 is None and isinstance(lineage, Mapping):
+        scoring_configuration_sha256 = lineage.get("scoring_config_sha256")
+    scoring_run = {
+        "configuration_sha256": scoring_configuration_sha256,
+        "results": vintage["results"],
+    }
     with tempfile.TemporaryDirectory(prefix="winner-tilt-shadow-") as tmp:
         score_path = Path(tmp) / "scores.json"
         output_path = Path(tmp) / "portfolio.json"
         score_path.write_text(json.dumps(scoring_run), encoding="utf-8")
-        command = [sys.executable, "-m", "winner_tilt.portfolio", "--config", str(portfolio_config_path),
-                   "--universe", str(universe_path), "--scores", str(score_path), "--output", str(output_path),
-                   "--as-of-date", as_of_date]
+        command = [
+            sys.executable,
+            "-m",
+            "winner_tilt.portfolio",
+            "--config",
+            str(portfolio_config_path),
+            "--universe",
+            str(universe_path),
+            "--scores",
+            str(score_path),
+            "--output",
+            str(output_path),
+            "--as-of-date",
+            as_of_date,
+        ]
         if previous_path:
             command.extend(["--previous", str(previous_path)])
         completed = subprocess.run(command, capture_output=True, text=True, check=False)
@@ -122,8 +183,13 @@ def run_shadow_portfolio(*, vintage_path: str | Path, portfolio_config_path: str
             "universe_sha256": hashlib.sha256(Path(universe_path).read_bytes()).hexdigest(),
             "portfolio_output_sha256": _hash(portfolio),
         },
-        "execution_boundary": {"broker_connected": False, "orders_created": False, "orders_executed": False,
-                               "automatic_dca": False, "automatic_exits": False},
+        "execution_boundary": {
+            "broker_connected": False,
+            "orders_created": False,
+            "orders_executed": False,
+            "automatic_dca": False,
+            "automatic_exits": False,
+        },
     }
     result["output_sha256"] = _hash(result)
     return result
@@ -138,9 +204,13 @@ def main() -> None:
     parser.add_argument("--output", required=True)
     parser.add_argument("--previous")
     args = parser.parse_args()
-    result = run_shadow_portfolio(vintage_path=args.vintage, portfolio_config_path=args.portfolio_config,
-                                  universe_path=args.universe, as_of_date=args.as_of_date,
-                                  previous_path=args.previous)
+    result = run_shadow_portfolio(
+        vintage_path=args.vintage,
+        portfolio_config_path=args.portfolio_config,
+        universe_path=args.universe,
+        as_of_date=args.as_of_date,
+        previous_path=args.previous,
+    )
     Path(args.output).write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
