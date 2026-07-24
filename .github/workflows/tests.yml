@@ -21,4 +21,15 @@ jobs:
       - name: Compile Python files
         run: python -m compileall src tests
       - name: Run tests
-        run: python -m pytest -q
+        shell: bash
+        run: |
+          set -o pipefail
+          python -m pytest -q 2>&1 | tee pytest.log
+      - name: Upload pytest diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: pytest.log
+          if-no-files-found: error
+          retention-days: 7
