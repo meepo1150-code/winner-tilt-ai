@@ -79,11 +79,7 @@ def _accepted_timestamp(fact: Mapping[str, Any]) -> str:
 
 
 def normalize_companyfacts(payload: Mapping[str, Any], *, expected_cik: str | int) -> tuple[dict[str, Any], ...]:
-    """Normalize an SEC Company Facts response deterministically.
-
-    Unknown fields are ignored. Amended filings remain distinct through the
-    accession number and form. No unit conversion or silent deduplication occurs.
-    """
+    """Normalize an SEC Company Facts response deterministically."""
     cik = _normalize_cik(expected_cik)
     payload_cik = _normalize_cik(payload.get("cik", ""))
     if payload_cik != cik:
@@ -222,6 +218,7 @@ class SecEdgarCompanyFactsProvider:
 
         return validate_provider_result(
             result,
+            max_staleness_days=550,
             natural_key_fields=("cik", "taxonomy", "concept", "unit", "report_end", "accession_number"),
             required_fields=("accepted_timestamp", "form", "accession_number", "unit", "report_end"),
         )
