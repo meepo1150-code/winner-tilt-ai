@@ -1,0 +1,121 @@
+name: Authorized Multi-CIK SEC Shadow Pilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      ciks:
+        description: Comma-separated SEC CIKs approved in the identifier registry (maximum 3)
+        required: true
+        default: "0000320193,0000789019,0001045810"
+      authorization:
+        description: Type AUTHORIZE_MULTI_CIK_SEC_SHADOW_RESEARCH_ONLY
+        required: true
+      information_cutoff:
+        description: ISO-8601 UTC cutoff after all live acquisitions
+        required: true
+      as_of_date:
+        description: Portfolio as-of date (YYYY-MM-DD)
+        required: true
+      decision_timestamp:
+        description: ISO-8601 UTC audit timestamp
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  authorized-multi-cik-shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      WINNER_TILT_SEC_EDGAR_LIVE_ENABLED: "true"
+      WINNER_TILT_SEC_EDGAR_USER_AGENT: ${{ secrets.SEC_EDGAR_USER_AGENT }}
+      WINNER_TILT_SEC_EDGAR_CIKS: ${{ inputs.ciks }}
+      WINNER_TILT_SEC_EDGAR_MAX_TOTAL_REQUESTS: "3"
+      WINNER_TILT_SEC_EDGAR_KILL_SWITCH: "false"
+      RUN_ID: live-multi-cik-${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Verify SEC identity secret
+        shell: bash
+        run: |
+          if [ -z "$WINNER_TILT_SEC_EDGAR_USER_AGENT" ]; then
+            echo "SEC_EDGAR_USER_AGENT secret is missing"
+            exit 1
+          fi
+
+      - name: Validate explicit multi-CIK authorization
+        run: |
+          mkdir -p artifacts/live-multi-cik
+          python -m winner_tilt.multi_cik_live validate \
+            --ciks "${{ inputs.ciks }}" \
+            --authorization "${{ inputs.authorization }}" \
+            --identifier-registry config/winner-tilt-security-identifiers-v1.0.0.csv \
+            --output artifacts/live-multi-cik/authorization-gate.json
+
+      - name: Run bounded SEC EDGAR multi-CIK live ingest
+        run: python -m winner_tilt.sec_edgar_pilot --snapshot-dir runtime/live-multi-cik-sec
+
+      - name: Aggregate immutable snapshots recursively
+        run: |
+          python -m winner_tilt.multi_cik_live aggregate \
+            --gate artifacts/live-multi-cik/authorization-gate.json \
+            --snapshot-dir runtime/live-multi-cik-sec \
+            --snapshot-output artifacts/live-multi-cik/sec-companyfacts-aggregate-snapshot.json \
+            --manifest-output artifacts/live-multi-cik/sec-companyfacts-aggregate-manifest.json
+
+      - name: Run certified end-to-end shadow pipeline
+        run: |
+          python -m winner_tilt.shadow_pilot \
+            --root . \
+            --snapshot artifacts/live-multi-cik/sec-companyfacts-aggregate-snapshot.json \
+            --identifier-registry config/winner-tilt-security-identifiers-v1.0.0.csv \
+            --feature-definitions config/winner-tilt-sec-fundamental-features-v1.0.0.json \
+            --scoring-config config/winner-tilt-scoring-config-v1.0.0.json \
+            --portfolio-config config/winner-tilt-portfolio-config-v1.0.0.json \
+            --universe database/universe-v1.0.csv \
+            --output-dir artifacts/live-multi-cik/runs \
+            --information-cutoff "${{ inputs.information_cutoff }}" \
+            --as-of-date "${{ inputs.as_of_date }}" \
+            --decision-timestamp "${{ inputs.decision_timestamp }}" \
+            --run-id "$RUN_ID"
+
+      - name: Certify multi-CIK live artifact bundle
+        run: |
+          python -m winner_tilt.multi_cik_live finalize \
+            --gate artifacts/live-multi-cik/authorization-gate.json \
+            --aggregate-snapshot artifacts/live-multi-cik/sec-companyfacts-aggregate-snapshot.json \
+            --aggregate-manifest artifacts/live-multi-cik/sec-companyfacts-aggregate-manifest.json \
+            --shadow-manifest "artifacts/live-multi-cik/runs/$RUN_ID/run-manifest.json" \
+            --output artifacts/live-multi-cik/authorized-multi-cik-run-manifest.json
+
+      - name: Copy immutable source snapshots into artifact bundle
+        shell: bash
+        run: |
+          mkdir -p artifacts/live-multi-cik/source-snapshots
+          mapfile -t files < <(find runtime/live-multi-cik-sec -type f -name 'CIK*.json' | sort)
+          if [ "${#files[@]}" -lt 1 ] || [ "${#files[@]}" -gt 3 ]; then
+            echo "Expected 1-3 immutable source snapshots; found ${#files[@]}"
+            exit 1
+          fi
+          cp "${files[@]}" artifacts/live-multi-cik/source-snapshots/
+
+      - name: Upload authorized multi-CIK shadow artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: authorized-multi-cik-sec-shadow-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/live-multi-cik/
+          if-no-files-found: error
+          retention-days: 30
