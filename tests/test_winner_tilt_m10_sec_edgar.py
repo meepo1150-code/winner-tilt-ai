@@ -48,6 +48,7 @@ def test_provider_is_offline_by_default_and_ingest_only():
     assert result.provenance["raw_payload_retained"] is False
     assert result.provenance["pilot_scope"] == "ingest_only_no_downstream_consumption"
     assert result.provenance["publication_timestamp_policy"] == "accepted_when_available_else_filed_date_midnight_utc"
+    assert result.provenance["duplicate_policy"] == "drop_exact_duplicates_fail_on_conflicting_context_key"
     assert provider.latest_timestamp() == "2026-07-21T20:00:00Z"
     assert provider.validate(result).status == "PASS"
 
@@ -70,11 +71,32 @@ def test_allowlist_rate_and_retention_policies_fail_closed():
         provider.fetch(cik="789019", payload=load_fixture())
 
 
-def test_duplicate_natural_key_fails_closed():
+def test_exact_duplicate_fact_is_deduplicated():
     payload = load_fixture()
     duplicate = dict(payload["facts"]["us-gaap"]["Assets"]["units"]["USD"][0])
     payload["facts"]["us-gaap"]["Assets"]["units"]["USD"].append(duplicate)
-    with pytest.raises(SecEdgarPolicyError, match="DUPLICATE_NATURAL_KEY"):
+    rows = normalize_companyfacts(payload, expected_cik="320193")
+    assert len(rows) == 2
+
+
+def test_same_accession_and_end_with_different_contexts_are_distinct():
+    payload = load_fixture()
+    original = payload["facts"]["us-gaap"]["Assets"]["units"]["USD"][0]
+    contextual_variant = dict(original)
+    contextual_variant["start"] = "2025-09-28"
+    contextual_variant["frame"] = "CY2026Q2"
+    payload["facts"]["us-gaap"]["Assets"]["units"]["USD"].append(contextual_variant)
+    rows = normalize_companyfacts(payload, expected_cik="320193")
+    assert len(rows) == 3
+    assert {row["period_start"] for row in rows} >= {None, "2025-09-28"}
+
+
+def test_conflicting_fact_for_same_context_fails_closed():
+    payload = load_fixture()
+    conflicting = dict(payload["facts"]["us-gaap"]["Assets"]["units"]["USD"][0])
+    conflicting["val"] = conflicting["val"] + 1
+    payload["facts"]["us-gaap"]["Assets"]["units"]["USD"].append(conflicting)
+    with pytest.raises(SecEdgarPolicyError, match="CONFLICTING_NATURAL_KEY"):
         normalize_companyfacts(payload, expected_cik="320193")
 
 
