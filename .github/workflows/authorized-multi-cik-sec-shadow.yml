@@ -100,6 +100,21 @@ jobs:
             --decision-timestamp "${{ inputs.decision_timestamp }}" \
             --run-id "$RUN_ID"
 
+      - name: Certify portfolio readiness research package
+        shell: bash
+        run: |
+          set +e
+          python -m winner_tilt.portfolio_readiness \
+            --root . \
+            --run-manifest "artifacts/live-multi-cik/runs/$RUN_ID/run-manifest.json" \
+            --portfolio-config config/winner-tilt-portfolio-config-v1.0.0.json \
+            --assessment-output "artifacts/live-multi-cik/runs/$RUN_ID/portfolio-readiness-assessment.json" \
+            --package-output "artifacts/live-multi-cik/runs/$RUN_ID/investment-committee-research-package.json" \
+            2>&1 | tee artifacts/live-multi-cik/portfolio-readiness-output.log
+          status=${PIPESTATUS[0]}
+          set -e
+          exit "$status"
+
       - name: Certify multi-CIK live artifact bundle
         run: |
           python -m winner_tilt.multi_cik_live finalize \
