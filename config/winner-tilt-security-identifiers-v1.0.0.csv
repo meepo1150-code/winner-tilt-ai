@@ -1,2 +1,11 @@
 cik,security_id,ticker,status,effective_from,effective_to,source
-0000320193,WT-0005,AAPL,ACTIVE,2026-07-24,,SEC issuer CIK cross-checked against Winner Tilt universe
+0000320193,WT-0005,AAPL,ACTIVE,2026-07-24,,SEC company_tickers.json
+0000789019,WT-0001,MSFT,ACTIVE,2026-07-24,,SEC company_tickers.json
+0001045810,WT-0010,NVDA,ACTIVE,2026-07-24,,SEC company_tickers.json
+0001652044,WT-0003,GOOGL,ACTIVE,2026-07-24,,SEC company_tickers.json
+0001018724,WT-0002,AMZN,ACTIVE,2026-07-24,,SEC company_tickers.json
+0001730168,WT-0011,AVGO,ACTIVE,2026-07-24,,SEC company_tickers.json
+0001326801,WT-0004,META,ACTIVE,2026-07-24,,SEC company_tickers.json
+0000723125,WT-0015,MU,ACTIVE,2026-07-24,,SEC company_tickers.json
+0000002488,WT-0012,AMD,ACTIVE,2026-07-24,,SEC company_tickers.json
+0001341439,WT-0006,ORCL,ACTIVE,2026-07-24,,SEC company_tickers.json
