@@ -42,9 +42,9 @@ jobs:
             --snapshot "$SNAPSHOT" \
             --identifier-registry config/winner-tilt-security-identifiers-v1.0.0.csv \
             --feature-definitions config/winner-tilt-sec-fundamental-features-v1.0.0.json \
-            --scoring-config config/winner-tilt-scoring-config-v1.0.json \
-            --portfolio-config config/winner-tilt-portfolio-config-v1.0.json \
-            --universe data/universe-v1.0.csv \
+            --scoring-config config/winner-tilt-scoring-config-v1.0.0.json \
+            --portfolio-config config/winner-tilt-portfolio-config-v1.0.0.json \
+            --universe database/universe-v1.0.csv \
             --output-dir artifacts/shadow-pilot \
             --information-cutoff "$INFORMATION_CUTOFF" \
             --as-of-date "$AS_OF_DATE" \
