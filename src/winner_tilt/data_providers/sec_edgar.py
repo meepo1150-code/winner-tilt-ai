@@ -65,17 +65,32 @@ def _utc_now_iso(clock: Callable[[], datetime]) -> str:
     return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def _accepted_timestamp(fact: Mapping[str, Any]) -> str:
+def _publication_timestamp(fact: Mapping[str, Any]) -> tuple[str, str]:
+    """Return the best available point-in-time publication timestamp.
+
+    Company Facts responses commonly provide ``filed`` but not ``accepted``.
+    Prefer the precise accepted timestamp when present; otherwise use the filed
+    date at midnight UTC and label the source so consumers do not mistake the
+    fallback for filing-acceptance precision.
+    """
     accepted = fact.get("accepted")
-    if not isinstance(accepted, str) or not accepted.strip():
-        raise SecEdgarPolicyError("SEC_EDGAR_ACCEPTED_TIMESTAMP_REQUIRED")
+    if isinstance(accepted, str) and accepted.strip():
+        try:
+            parsed = datetime.fromisoformat(accepted.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise SecEdgarPolicyError("SEC_EDGAR_INVALID_ACCEPTED_TIMESTAMP") from exc
+        if parsed.tzinfo is None:
+            raise SecEdgarPolicyError("SEC_EDGAR_ACCEPTED_TIMESTAMP_TIMEZONE_REQUIRED")
+        return parsed.astimezone(timezone.utc).isoformat().replace("+00:00", "Z"), "accepted"
+
+    filed = fact.get("filed")
+    if not isinstance(filed, str) or not filed.strip():
+        raise SecEdgarPolicyError("SEC_EDGAR_PUBLICATION_TIMESTAMP_REQUIRED")
     try:
-        parsed = datetime.fromisoformat(accepted.replace("Z", "+00:00"))
+        parsed_filed = datetime.fromisoformat(f"{filed}T00:00:00+00:00")
     except ValueError as exc:
-        raise SecEdgarPolicyError("SEC_EDGAR_INVALID_ACCEPTED_TIMESTAMP") from exc
-    if parsed.tzinfo is None:
-        raise SecEdgarPolicyError("SEC_EDGAR_ACCEPTED_TIMESTAMP_TIMEZONE_REQUIRED")
-    return parsed.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+        raise SecEdgarPolicyError("SEC_EDGAR_INVALID_FILED_DATE") from exc
+    return parsed_filed.isoformat().replace("+00:00", "Z"), "filed_date_midnight_utc"
 
 
 def normalize_companyfacts(payload: Mapping[str, Any], *, expected_cik: str | int) -> tuple[dict[str, Any], ...]:
@@ -118,7 +133,7 @@ def normalize_companyfacts(payload: Mapping[str, Any], *, expected_cik: str | in
                     value = fact.get("val")
                     if not all(isinstance(v, str) and v for v in (accession, report_end, filed)):
                         raise SecEdgarPolicyError("SEC_EDGAR_REQUIRED_FACT_METADATA_MISSING")
-                    accepted = _accepted_timestamp(fact)
+                    publication_timestamp, timestamp_source = _publication_timestamp(fact)
                     natural_key = (cik, taxonomy, concept, unit, report_end, accession)
                     if natural_key in seen:
                         raise SecEdgarPolicyError("SEC_EDGAR_DUPLICATE_NATURAL_KEY")
@@ -133,7 +148,8 @@ def normalize_companyfacts(payload: Mapping[str, Any], *, expected_cik: str | in
                         "value": value,
                         "report_end": report_end,
                         "filed_date": filed,
-                        "accepted_timestamp": accepted,
+                        "accepted_timestamp": publication_timestamp,
+                        "accepted_timestamp_source": timestamp_source,
                         "form": form,
                         "accession_number": accession,
                         "fiscal_year": fact.get("fy"),
@@ -208,6 +224,7 @@ class SecEdgarCompanyFactsProvider:
                 "raw_content_sha256": _canonical_hash(payload),
                 "raw_payload_retained": False,
                 "pilot_scope": "ingest_only_no_downstream_consumption",
+                "publication_timestamp_policy": "accepted_when_available_else_filed_date_midnight_utc",
             },
             validation_state="unvalidated",
             publication_timestamp=publication_timestamp,
@@ -220,7 +237,14 @@ class SecEdgarCompanyFactsProvider:
             result,
             max_staleness_days=550,
             natural_key_fields=("cik", "taxonomy", "concept", "unit", "report_end", "accession_number"),
-            required_fields=("accepted_timestamp", "form", "accession_number", "unit", "report_end"),
+            required_fields=(
+                "accepted_timestamp",
+                "accepted_timestamp_source",
+                "form",
+                "accession_number",
+                "unit",
+                "report_end",
+            ),
         )
 
     def latest_timestamp(self) -> str | None:
