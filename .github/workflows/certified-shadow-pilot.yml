@@ -1,0 +1,59 @@
+name: Certified Shadow Pilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      snapshot:
+        description: Repository-relative immutable SEC snapshot path
+        required: true
+      information_cutoff:
+        description: ISO-8601 UTC information cutoff
+        required: true
+      as_of_date:
+        description: Portfolio as-of date (YYYY-MM-DD)
+        required: true
+      decision_timestamp:
+        description: ISO-8601 UTC audit timestamp
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  shadow-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install package
+        run: python -m pip install -e .
+      - name: Run certified shadow pilot
+        env:
+          SNAPSHOT: ${{ inputs.snapshot }}
+          INFORMATION_CUTOFF: ${{ inputs.information_cutoff }}
+          AS_OF_DATE: ${{ inputs.as_of_date }}
+          DECISION_TIMESTAMP: ${{ inputs.decision_timestamp }}
+          RUN_ID: shadow-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          python -m winner_tilt.shadow_pilot \
+            --snapshot "$SNAPSHOT" \
+            --identifier-registry config/winner-tilt-security-identifiers-v1.0.0.csv \
+            --feature-definitions config/winner-tilt-sec-fundamental-features-v1.0.0.json \
+            --scoring-config config/winner-tilt-scoring-config-v1.0.json \
+            --portfolio-config config/winner-tilt-portfolio-config-v1.0.json \
+            --universe data/universe-v1.0.csv \
+            --output-dir artifacts/shadow-pilot \
+            --information-cutoff "$INFORMATION_CUTOFF" \
+            --as-of-date "$AS_OF_DATE" \
+            --decision-timestamp "$DECISION_TIMESTAMP" \
+            --run-id "$RUN_ID"
+      - name: Upload shadow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: certified-shadow-pilot-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/shadow-pilot/
+          if-no-files-found: error
+          retention-days: 30
