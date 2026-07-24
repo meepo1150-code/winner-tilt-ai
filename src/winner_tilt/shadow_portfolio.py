@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-ENGINE_VERSION = "1.0.1"
+ENGINE_VERSION = "1.0.2"
 
 
 class ShadowPortfolioError(ValueError):
@@ -36,21 +36,12 @@ def _parse_utc(value: Any, code: str) -> datetime:
 
 
 def _validate_lineage(value: Any) -> None:
-    """Accept the M13 named-hash mapping and the legacy list representation."""
     if isinstance(value, Mapping):
-        if not value:
-            raise ShadowPortfolioError("SHADOW_PORTFOLIO_LINEAGE_REQUIRED")
         required = {
-            "pipeline_version",
-            "snapshot_file_sha256",
-            "snapshot_payload_sha256",
-            "raw_content_sha256",
-            "identifier_registry_sha256",
-            "feature_definitions_sha256",
-            "fundamental_feature_output_sha256",
-            "scoring_config_sha256",
-            "universe_sha256",
-            "scoring_output_sha256",
+            "pipeline_version", "snapshot_file_sha256", "snapshot_payload_sha256",
+            "raw_content_sha256", "identifier_registry_sha256", "feature_definitions_sha256",
+            "fundamental_feature_output_sha256", "scoring_config_sha256",
+            "universe_sha256", "scoring_output_sha256",
         }
         if not required.issubset(value):
             raise ShadowPortfolioError("SHADOW_PORTFOLIO_LINEAGE_INCOMPLETE")
@@ -106,11 +97,16 @@ def certify_vintage(payload: Mapping[str, Any], *, as_of_date: str) -> dict[str,
         "status": "CERTIFIED",
         "cutoff": vintage["information_cutoff"],
         "result_count": len(results),
+        "eligible_result_count": len(ranks),
         "vintage_sha256": _hash(vintage),
     }
 
 
 def _validate_output(output: Mapping[str, Any], cfg: Mapping[str, Any]) -> None:
+    if output.get("construction_status") == "INSUFFICIENT_COVERAGE_RESEARCH_ONLY":
+        if output.get("holdings") != [] or output.get("reserves") != [] or output.get("dca_allocation") != {}:
+            raise ShadowPortfolioError("SHADOW_PORTFOLIO_FALLBACK_CONTRACT_FAILED")
+        return
     holdings = output.get("holdings")
     reserves = output.get("reserves")
     if not isinstance(holdings, list) or len(holdings) != cfg["portfolio"]["holdings_count"]:
@@ -125,14 +121,43 @@ def _validate_output(output: Mapping[str, Any], cfg: Mapping[str, Any]) -> None:
         raise ShadowPortfolioError("SHADOW_PORTFOLIO_WEIGHT_CONTRACT_FAILED")
 
 
-def run_shadow_portfolio(
-    *,
-    vintage_path: str | Path,
-    portfolio_config_path: str | Path,
-    universe_path: str | Path,
-    as_of_date: str,
-    previous_path: str | Path | None = None,
-) -> dict[str, Any]:
+def _insufficient_coverage_portfolio(*, vintage: Mapping[str, Any], config: Mapping[str, Any], as_of_date: str) -> dict[str, Any]:
+    eligible = [
+        row for row in vintage["results"]
+        if row.get("eligible") is True and row.get("total_score") is not None
+    ]
+    return {
+        "engine_version": "portfolio-engine-not-executed",
+        "as_of_date": as_of_date,
+        "configuration_sha256": config.get("configuration_sha256") or _hash({k: v for k, v in config.items() if k != "configuration_sha256"}),
+        "source_scoring_configuration_sha256": (
+            vintage.get("scoring_configuration_sha256")
+            or (vintage.get("lineage") or {}).get("scoring_config_sha256")
+        ),
+        "construction_status": "INSUFFICIENT_COVERAGE_RESEARCH_ONLY",
+        "holdings": [],
+        "reserves": [],
+        "exits": [],
+        "dca_allocation": {},
+        "portfolio_summary": {
+            "holdings_count": 0,
+            "reserves_count": 0,
+            "one_way_turnover": 0.0,
+            "emerging_count": 0,
+            "eligible_candidate_count": len(eligible),
+            "required_candidate_count": config["portfolio"]["holdings_count"] + config["portfolio"]["reserves_count"],
+        },
+        "audit": {
+            "reason": "Certified score vintage contains insufficient eligible coverage for the frozen portfolio target.",
+            "portfolio_engine_executed": False,
+            "frozen_portfolio_rules_modified": False,
+        },
+    }
+
+
+def run_shadow_portfolio(*, vintage_path: str | Path, portfolio_config_path: str | Path,
+                         universe_path: str | Path, as_of_date: str,
+                         previous_path: str | Path | None = None) -> dict[str, Any]:
     vintage_payload = json.loads(Path(vintage_path).read_text(encoding="utf-8"))
     config = json.loads(Path(portfolio_config_path).read_text(encoding="utf-8"))
     certification = certify_vintage(vintage_payload, as_of_date=as_of_date)
@@ -141,35 +166,23 @@ def run_shadow_portfolio(
     scoring_configuration_sha256 = vintage.get("scoring_configuration_sha256")
     if scoring_configuration_sha256 is None and isinstance(lineage, Mapping):
         scoring_configuration_sha256 = lineage.get("scoring_config_sha256")
-    scoring_run = {
-        "configuration_sha256": scoring_configuration_sha256,
-        "results": vintage["results"],
-    }
+    scoring_run = {"configuration_sha256": scoring_configuration_sha256, "results": vintage["results"]}
     with tempfile.TemporaryDirectory(prefix="winner-tilt-shadow-") as tmp:
         score_path = Path(tmp) / "scores.json"
         output_path = Path(tmp) / "portfolio.json"
         score_path.write_text(json.dumps(scoring_run), encoding="utf-8")
-        command = [
-            sys.executable,
-            "-m",
-            "winner_tilt.portfolio",
-            "--config",
-            str(portfolio_config_path),
-            "--universe",
-            str(universe_path),
-            "--scores",
-            str(score_path),
-            "--output",
-            str(output_path),
-            "--as-of-date",
-            as_of_date,
-        ]
+        command = [sys.executable, "-m", "winner_tilt.portfolio", "--config", str(portfolio_config_path),
+                   "--universe", str(universe_path), "--scores", str(score_path), "--output", str(output_path),
+                   "--as-of-date", as_of_date]
         if previous_path:
             command.extend(["--previous", str(previous_path)])
         completed = subprocess.run(command, capture_output=True, text=True, check=False)
         if completed.returncode != 0:
-            raise ShadowPortfolioError("SHADOW_PORTFOLIO_ENGINE_FAILED:" + completed.stderr.strip())
-        portfolio = json.loads(output_path.read_text(encoding="utf-8"))
+            if "Unable to fill target=" not in completed.stderr:
+                raise ShadowPortfolioError("SHADOW_PORTFOLIO_ENGINE_FAILED:" + completed.stderr.strip())
+            portfolio = _insufficient_coverage_portfolio(vintage=vintage, config=config, as_of_date=as_of_date)
+        else:
+            portfolio = json.loads(output_path.read_text(encoding="utf-8"))
     _validate_output(portfolio, config)
     result = {
         "engine_version": ENGINE_VERSION,
@@ -204,13 +217,9 @@ def main() -> None:
     parser.add_argument("--output", required=True)
     parser.add_argument("--previous")
     args = parser.parse_args()
-    result = run_shadow_portfolio(
-        vintage_path=args.vintage,
-        portfolio_config_path=args.portfolio_config,
-        universe_path=args.universe,
-        as_of_date=args.as_of_date,
-        previous_path=args.previous,
-    )
+    result = run_shadow_portfolio(vintage_path=args.vintage, portfolio_config_path=args.portfolio_config,
+                                  universe_path=args.universe, as_of_date=args.as_of_date,
+                                  previous_path=args.previous)
     Path(args.output).write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
