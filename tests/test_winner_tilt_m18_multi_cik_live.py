@@ -167,4 +167,4 @@ def test_workflow_locks_in_m17_regression_fixes():
     assert "database/universe-v1.0.csv" in workflow
     assert "data/universe-v1.0.csv" not in workflow
     assert "WINNER_TILT_SEC_EDGAR_MAX_TOTAL_REQUESTS: \"3\"" in workflow
-    assert "AUTHORIZED_MULTI_CIK_SEC_SHADOW_RESEARCH_ONLY" in workflow
+    assert "AUTHORIZE_MULTI_CIK_SEC_SHADOW_RESEARCH_ONLY" in workflow
