@@ -8,8 +8,11 @@ on:
         required: true
         default: "0000320193,0000789019,0001045810"
       authorization:
-        description: Type AUTHORIZE_MULTI_CIK_SEC_SHADOW_RESEARCH_ONLY
+        description: Explicit research-only live authorization
         required: true
+        type: choice
+        options:
+          - AUTHORIZE_MULTI_CIK_SEC_SHADOW_RESEARCH_ONLY
       information_cutoff:
         description: ISO-8601 UTC cutoff after all live acquisitions
         required: true
@@ -56,13 +59,19 @@ jobs:
           fi
 
       - name: Validate explicit multi-CIK authorization
+        shell: bash
         run: |
           mkdir -p artifacts/live-multi-cik
+          set +e
           python -m winner_tilt.multi_cik_live validate \
             --ciks "${{ inputs.ciks }}" \
             --authorization "${{ inputs.authorization }}" \
             --identifier-registry config/winner-tilt-security-identifiers-v1.0.0.csv \
-            --output artifacts/live-multi-cik/authorization-gate.json
+            --output artifacts/live-multi-cik/authorization-gate.json \
+            2>&1 | tee artifacts/live-multi-cik/authorization-gate-output.log
+          status=${PIPESTATUS[0]}
+          set -e
+          exit "$status"
 
       - name: Run bounded SEC EDGAR multi-CIK live ingest
         run: python -m winner_tilt.sec_edgar_pilot --snapshot-dir runtime/live-multi-cik-sec
