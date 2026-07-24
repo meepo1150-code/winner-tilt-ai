@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-ENGINE_VERSION = "1.0.0"
+ENGINE_VERSION = "1.0.1"
 AUTHORIZATION_PHRASE = "AUTHORIZE_LIVE_SEC_SHADOW_RESEARCH_ONLY"
 
 
@@ -61,8 +61,14 @@ def validate_authorization(*, cik: str, authorization: str, identifier_registry_
 
 
 def select_single_snapshot(snapshot_dir: str | Path) -> Path:
+    """Select exactly one immutable SEC JSON snapshot below a run directory.
+
+    SEC ingest stores snapshots under ``<snapshot_dir>/<run_timestamp>/CIK....json``.
+    Discovery therefore must be recursive while remaining fail-closed when zero or
+    multiple JSON snapshots exist.
+    """
     root = Path(snapshot_dir)
-    candidates = sorted(path for path in root.glob("*.json") if path.is_file())
+    candidates = sorted(path for path in root.rglob("CIK*.json") if path.is_file())
     if len(candidates) != 1:
         raise LiveShadowGateError("LIVE_SHADOW_SINGLE_SNAPSHOT_REQUIRED")
     return candidates[0]
