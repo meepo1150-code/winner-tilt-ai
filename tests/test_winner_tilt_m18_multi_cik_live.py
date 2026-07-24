@@ -161,10 +161,13 @@ def test_finalize_preserves_non_executable_boundary(tmp_path):
         )
 
 
-def test_workflow_locks_in_m17_regression_fixes():
+def test_workflow_locks_in_m17_regression_fixes_and_safe_authorization_ui():
     workflow = Path(".github/workflows/authorized-multi-cik-sec-shadow.yml").read_text(encoding="utf-8")
     assert "find runtime/live-multi-cik-sec -type f -name 'CIK*.json'" in workflow
     assert "database/universe-v1.0.csv" in workflow
     assert "data/universe-v1.0.csv" not in workflow
-    assert "WINNER_TILT_SEC_EDGAR_MAX_TOTAL_REQUESTS: \"3\"" in workflow
-    assert "AUTHORIZE_MULTI_CIK_SEC_SHADOW_RESEARCH_ONLY" in workflow
+    assert 'WINNER_TILT_SEC_EDGAR_MAX_TOTAL_REQUESTS: "3"' in workflow
+    assert "type: choice" in workflow
+    assert "- AUTHORIZE_MULTI_CIK_SEC_SHADOW_RESEARCH_ONLY" in workflow
+    assert "authorization-gate-output.log" in workflow
+    assert "${PIPESTATUS[0]}" in workflow
