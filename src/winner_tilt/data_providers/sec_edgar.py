@@ -257,6 +257,7 @@ class SecEdgarCompanyFactsProvider:
                 "pilot_scope": "ingest_only_no_downstream_consumption",
                 "publication_timestamp_policy": "accepted_when_available_else_filed_date_midnight_utc",
                 "duplicate_policy": "drop_exact_duplicates_fail_on_conflicting_context_key",
+                "row_id_policy": "sha256_of_context_key_truncated_16_hex",
             },
             validation_state="unvalidated",
             publication_timestamp=publication_timestamp,
@@ -265,22 +266,14 @@ class SecEdgarCompanyFactsProvider:
     def validate(self, result: ProviderResult):
         from winner_tilt.validation import validate_provider_result
 
+        # Optional SEC context fields (start/frame/fy/fp) may legitimately be absent.
+        # The deterministic row id already hashes the complete context key, including
+        # null values, so validating id uniqueness preserves the same semantics
+        # without incorrectly requiring optional fields.
         return validate_provider_result(
             result,
             max_staleness_days=550,
-            natural_key_fields=(
-                "cik",
-                "taxonomy",
-                "concept",
-                "unit",
-                "period_start",
-                "report_end",
-                "accession_number",
-                "form",
-                "fiscal_year",
-                "fiscal_period",
-                "frame",
-            ),
+            natural_key_fields=("id",),
             required_fields=(
                 "accepted_timestamp",
                 "accepted_timestamp_source",
