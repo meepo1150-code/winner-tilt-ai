@@ -1,9 +1,4 @@
-"""Controlled SEC EDGAR Company Facts fundamentals pilot.
-
-The adapter is offline-by-default and transport-injected. It normalizes a
-small allowlisted Company Facts payload into the existing ProviderResult
-contract without connecting the data to downstream investment engines.
-"""
+"""Controlled SEC EDGAR Company Facts fundamentals pilot."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -66,13 +61,6 @@ def _utc_now_iso(clock: Callable[[], datetime]) -> str:
 
 
 def _publication_timestamp(fact: Mapping[str, Any]) -> tuple[str, str]:
-    """Return the best available point-in-time publication timestamp.
-
-    Company Facts responses commonly provide ``filed`` but not ``accepted``.
-    Prefer the precise accepted timestamp when present; otherwise use the filed
-    date at midnight UTC and label the source so consumers do not mistake the
-    fallback for filing-acceptance precision.
-    """
     accepted = fact.get("accepted")
     if isinstance(accepted, str) and accepted.strip():
         try:
@@ -93,6 +81,34 @@ def _publication_timestamp(fact: Mapping[str, Any]) -> tuple[str, str]:
     return parsed_filed.isoformat().replace("+00:00", "Z"), "filed_date_midnight_utc"
 
 
+def _fact_natural_key(
+    *,
+    cik: str,
+    taxonomy: str,
+    concept: str,
+    unit: str,
+    fact: Mapping[str, Any],
+) -> tuple[Any, ...]:
+    """Return a context-aware Company Facts key.
+
+    SEC can publish multiple facts for one accession and period end when their
+    duration, fiscal context, or frame differs. Those are distinct observations.
+    """
+    return (
+        cik,
+        taxonomy,
+        concept,
+        unit,
+        fact.get("start"),
+        fact.get("end"),
+        fact.get("accn"),
+        fact.get("form"),
+        fact.get("fy"),
+        fact.get("fp"),
+        fact.get("frame"),
+    )
+
+
 def normalize_companyfacts(payload: Mapping[str, Any], *, expected_cik: str | int) -> tuple[dict[str, Any], ...]:
     """Normalize an SEC Company Facts response deterministically."""
     cik = _normalize_cik(expected_cik)
@@ -105,7 +121,7 @@ def normalize_companyfacts(payload: Mapping[str, Any], *, expected_cik: str | in
         raise SecEdgarPolicyError("SEC_EDGAR_FACTS_REQUIRED")
 
     rows: list[dict[str, Any]] = []
-    seen: set[tuple[Any, ...]] = set()
+    seen: dict[tuple[Any, ...], str] = {}
     for taxonomy in sorted(facts):
         concepts = facts[taxonomy]
         if not isinstance(concepts, Mapping):
@@ -130,22 +146,37 @@ def normalize_companyfacts(payload: Mapping[str, Any], *, expected_cik: str | in
                     accession = fact.get("accn")
                     report_end = fact.get("end")
                     filed = fact.get("filed")
-                    value = fact.get("val")
                     if not all(isinstance(v, str) and v for v in (accession, report_end, filed)):
                         raise SecEdgarPolicyError("SEC_EDGAR_REQUIRED_FACT_METADATA_MISSING")
+
                     publication_timestamp, timestamp_source = _publication_timestamp(fact)
-                    natural_key = (cik, taxonomy, concept, unit, report_end, accession)
-                    if natural_key in seen:
-                        raise SecEdgarPolicyError("SEC_EDGAR_DUPLICATE_NATURAL_KEY")
-                    seen.add(natural_key)
+                    natural_key = _fact_natural_key(
+                        cik=cik,
+                        taxonomy=taxonomy,
+                        concept=concept,
+                        unit=unit,
+                        fact=fact,
+                    )
+                    fact_hash = _canonical_hash(fact)
+                    previous_hash = seen.get(natural_key)
+                    if previous_hash is not None:
+                        if previous_hash == fact_hash:
+                            continue
+                        raise SecEdgarPolicyError("SEC_EDGAR_CONFLICTING_NATURAL_KEY")
+                    seen[natural_key] = fact_hash
+
+                    key_hash = hashlib.sha256(
+                        json.dumps(natural_key, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+                    ).hexdigest()[:16]
                     rows.append({
-                        "id": f"{cik}:{taxonomy}:{concept}:{unit}:{report_end}:{accession}",
+                        "id": f"{cik}:{taxonomy}:{concept}:{unit}:{key_hash}",
                         "security_id": cik,
                         "cik": cik,
                         "taxonomy": taxonomy,
                         "concept": concept,
                         "unit": unit,
-                        "value": value,
+                        "value": fact.get("val"),
+                        "period_start": fact.get("start"),
                         "report_end": report_end,
                         "filed_date": filed,
                         "accepted_timestamp": publication_timestamp,
@@ -225,6 +256,7 @@ class SecEdgarCompanyFactsProvider:
                 "raw_payload_retained": False,
                 "pilot_scope": "ingest_only_no_downstream_consumption",
                 "publication_timestamp_policy": "accepted_when_available_else_filed_date_midnight_utc",
+                "duplicate_policy": "drop_exact_duplicates_fail_on_conflicting_context_key",
             },
             validation_state="unvalidated",
             publication_timestamp=publication_timestamp,
@@ -236,7 +268,19 @@ class SecEdgarCompanyFactsProvider:
         return validate_provider_result(
             result,
             max_staleness_days=550,
-            natural_key_fields=("cik", "taxonomy", "concept", "unit", "report_end", "accession_number"),
+            natural_key_fields=(
+                "cik",
+                "taxonomy",
+                "concept",
+                "unit",
+                "period_start",
+                "report_end",
+                "accession_number",
+                "form",
+                "fiscal_year",
+                "fiscal_period",
+                "frame",
+            ),
             required_fields=(
                 "accepted_timestamp",
                 "accepted_timestamp_source",
