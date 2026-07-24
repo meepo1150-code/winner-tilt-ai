@@ -37,6 +37,7 @@ def test_fixture_normalizes_deterministically_and_preserves_amendment_lineage():
     assert len(rows1) == 2
     assert rows1[0]["accession_number"] != rows1[1]["accession_number"]
     assert {row["is_amendment"] for row in rows1} == {False, True}
+    assert {row["accepted_timestamp_source"] for row in rows1} == {"accepted"}
 
 
 def test_provider_is_offline_by_default_and_ingest_only():
@@ -46,6 +47,7 @@ def test_provider_is_offline_by_default_and_ingest_only():
     assert result.provider_id == "sec-edgar-companyfacts"
     assert result.provenance["raw_payload_retained"] is False
     assert result.provenance["pilot_scope"] == "ingest_only_no_downstream_consumption"
+    assert result.provenance["publication_timestamp_policy"] == "accepted_when_available_else_filed_date_midnight_utc"
     assert provider.latest_timestamp() == "2026-07-21T20:00:00Z"
     assert provider.validate(result).status == "PASS"
 
@@ -68,16 +70,34 @@ def test_allowlist_rate_and_retention_policies_fail_closed():
         provider.fetch(cik="789019", payload=load_fixture())
 
 
-def test_duplicate_natural_key_and_missing_acceptance_fail_closed():
+def test_duplicate_natural_key_fails_closed():
     payload = load_fixture()
     duplicate = dict(payload["facts"]["us-gaap"]["Assets"]["units"]["USD"][0])
     payload["facts"]["us-gaap"]["Assets"]["units"]["USD"].append(duplicate)
     with pytest.raises(SecEdgarPolicyError, match="DUPLICATE_NATURAL_KEY"):
         normalize_companyfacts(payload, expected_cik="320193")
 
+
+def test_companyfacts_without_accepted_uses_filed_date_fallback():
     payload = load_fixture()
-    del payload["facts"]["us-gaap"]["Assets"]["units"]["USD"][0]["accepted"]
-    with pytest.raises(SecEdgarPolicyError, match="ACCEPTED_TIMESTAMP_REQUIRED"):
+    for fact in payload["facts"]["us-gaap"]["Assets"]["units"]["USD"]:
+        fact.pop("accepted", None)
+
+    rows = normalize_companyfacts(payload, expected_cik="320193")
+
+    assert {row["accepted_timestamp_source"] for row in rows} == {"filed_date_midnight_utc"}
+    assert {row["accepted_timestamp"] for row in rows} == {
+        "2026-07-20T00:00:00Z",
+        "2026-07-21T00:00:00Z",
+    }
+
+
+def test_missing_accepted_and_filed_timestamp_fails_closed():
+    payload = load_fixture()
+    fact = payload["facts"]["us-gaap"]["Assets"]["units"]["USD"][0]
+    fact.pop("accepted", None)
+    fact.pop("filed", None)
+    with pytest.raises(SecEdgarPolicyError, match="REQUIRED_FACT_METADATA_MISSING"):
         normalize_companyfacts(payload, expected_cik="320193")
 
 
