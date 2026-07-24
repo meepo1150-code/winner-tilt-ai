@@ -1,0 +1,155 @@
+name: Factor Attribution Certification
+
+on:
+  workflow_dispatch:
+    inputs:
+      authorization:
+        description: Explicit research-only factor attribution authorization
+        required: true
+        type: choice
+        options:
+          - AUTHORIZE_FACTOR_ATTRIBUTION_RESEARCH_ONLY
+
+permissions:
+  contents: read
+
+jobs:
+  factor-attribution-certification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Build deterministic certified attribution fixtures
+        shell: bash
+        run: |
+          mkdir -p artifacts/factor-attribution/input/scores/2025 artifacts/factor-attribution/output
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("artifacts/factor-attribution/input")
+          boundary = {
+              "broker_connected": False,
+              "orders_created": False,
+              "orders_executed": False,
+              "automatic_dca": False,
+              "automatic_exits": False,
+          }
+          replay = {
+              "status": "CERTIFIED_HISTORICAL_REPLAY_RESEARCH_ONLY",
+              "period_count": 3,
+              "portfolio_ready_period_count": 2,
+              "insufficient_coverage_period_count": 1,
+              "periods": [
+                  {"information_cutoff": "2025-01-31T23:59:59Z", "status": "PORTFOLIO_READY"},
+                  {"information_cutoff": "2025-02-28T23:59:59Z", "status": "INSUFFICIENT_COVERAGE"},
+                  {"information_cutoff": "2025-03-31T23:59:59Z", "status": "PORTFOLIO_READY"},
+              ],
+              "execution_boundary": boundary,
+          }
+          performance = {
+              "status": "PERFORMANCE_CERTIFIED",
+              "observation_count": 6,
+              "execution_boundary": boundary,
+          }
+          fixtures = [
+              ("2025-01-31T23:59:59Z", "AAA", "Technology", True,
+               {"profitability": 12.0, "growth": 15.0, "quality": 9.0, "valuation": 6.0, "risk_penalty": -4.0}),
+              ("2025-02-28T23:59:59Z", "BBB", "Health Care", False,
+               {"profitability": 7.0, "growth": 5.0, "quality": 8.0, "valuation": 3.0, "risk_penalty": -6.0}),
+              ("2025-03-31T23:59:59Z", "CCC", "Industrials", True,
+               {"profitability": 10.0, "growth": 11.0, "quality": 12.0, "valuation": 5.0, "risk_penalty": -3.0}),
+          ]
+          for index, (cutoff, sid, sector, eligible, factors) in enumerate(fixtures, start=1):
+              payload = {
+                  "information_cutoff": cutoff,
+                  "results": [{
+                      "security_id": sid,
+                      "sector": sector,
+                      "eligible": eligible,
+                      "base_score": 50.0,
+                      "total_score": 50.0 + sum(factors.values()),
+                      "factor_contributions": factors,
+                  }],
+              }
+              path = root / "scores/2025" / f"vintage-{index:02d}.json"
+              path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+          (root / "historical-replay-manifest.json").write_text(json.dumps(replay, indent=2, sort_keys=True) + "\n")
+          (root / "performance-certification.json").write_text(json.dumps(performance, indent=2, sort_keys=True) + "\n")
+          PY
+
+      - name: Certify factor attribution and explainability
+        shell: bash
+        run: |
+          set +e
+          python -m winner_tilt.factor_attribution \
+            --score-input artifacts/factor-attribution/input/scores \
+            --replay-manifest artifacts/factor-attribution/input/historical-replay-manifest.json \
+            --performance-certification artifacts/factor-attribution/input/performance-certification.json \
+            --authorization "${{ inputs.authorization }}" \
+            --output artifacts/factor-attribution/output/factor-attribution.json \
+            2>&1 | tee artifacts/factor-attribution/output/factor-attribution-output.log
+          status=${PIPESTATUS[0]}
+          set -e
+          exit "$status"
+
+      - name: Build explainability and certification manifest
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path("artifacts/factor-attribution")
+          report_path = root / "output/factor-attribution.json"
+          report = json.loads(report_path.read_text())
+          if report["status"] != "FACTOR_ATTRIBUTION_CERTIFIED_RESEARCH_ONLY":
+              raise SystemExit("Expected certified factor attribution")
+          if any(report["execution_boundary"].values()):
+              raise SystemExit("Execution boundary violation")
+          explainability = {
+              "status": "CERTIFIED_FACTOR_EXPLAINABILITY_RESEARCH_ONLY",
+              "security_explanations": report["security_explanations"],
+              "aggregate_attribution": report["aggregate_attribution"],
+              "readiness_summary": report["readiness_summary"],
+              "research_only": True,
+          }
+          explain_path = root / "output/factor-explainability.json"
+          explain_path.write_text(json.dumps(explainability, indent=2, sort_keys=True) + "\n")
+          files = {
+              "historical_replay_manifest": root / "input/historical-replay-manifest.json",
+              "performance_certification": root / "input/performance-certification.json",
+              "factor_attribution": report_path,
+              "factor_explainability": explain_path,
+          }
+          manifest = {
+              "status": "COMPLETED_FACTOR_ATTRIBUTION_RESEARCH_ONLY",
+              "artifacts": {name: str(path.relative_to(root)) for name, path in files.items()},
+              "artifact_sha256": {name: hashlib.sha256(path.read_bytes()).hexdigest() for name, path in files.items()},
+              "lineage": report["lineage"],
+              "execution_boundary": report["execution_boundary"],
+              "broker_integration_enabled": False,
+          }
+          encoded = json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode()
+          manifest["manifest_sha256"] = hashlib.sha256(encoded).hexdigest()
+          (root / "output/factor-attribution-manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+          PY
+
+      - name: Upload factor attribution certification artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: factor-attribution-certification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/factor-attribution/
+          if-no-files-found: error
+          retention-days: 30
