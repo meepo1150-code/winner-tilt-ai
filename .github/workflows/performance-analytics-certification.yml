@@ -1,0 +1,157 @@
+name: Performance Analytics Certification
+
+on:
+  workflow_dispatch:
+    inputs:
+      authorization:
+        description: Explicit research-only performance certification authorization
+        required: true
+        type: choice
+        options:
+          - AUTHORIZE_PERFORMANCE_ANALYTICS_RESEARCH_ONLY
+
+permissions:
+  contents: read
+
+jobs:
+  performance-analytics-certification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Build deterministic replay and backtest fixtures
+        shell: bash
+        run: |
+          mkdir -p artifacts/performance-analytics/input artifacts/performance-analytics/output
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from winner_tilt.performance_analytics import _metrics
+
+          root = Path("artifacts/performance-analytics/input")
+          replay = {
+              "status": "CERTIFIED_HISTORICAL_REPLAY_RESEARCH_ONLY",
+              "period_count": 3,
+              "portfolio_ready_period_count": 2,
+              "insufficient_coverage_period_count": 1,
+              "periods": [
+                  {"information_cutoff": "2025-01-31T23:59:59Z", "status": "PORTFOLIO_READY"},
+                  {"information_cutoff": "2025-02-28T23:59:59Z", "status": "INSUFFICIENT_COVERAGE"},
+                  {"information_cutoff": "2025-03-31T23:59:59Z", "status": "PORTFOLIO_READY"},
+              ],
+              "execution_boundary": {
+                  "broker_connected": False,
+                  "orders_created": False,
+                  "orders_executed": False,
+                  "automatic_dca": False,
+                  "automatic_exits": False,
+              },
+          }
+          values = [100000.0, 101500.0, 100800.0, 103250.0, 104100.0, 106000.0]
+          benchmark = [100000.0, 101000.0, 101600.0, 102200.0, 103000.0, 104000.0]
+          curve = []
+          for index, value in enumerate(values, start=1):
+              curve.append({
+                  "date": f"2025-01-{index:02d}",
+                  "portfolio_value": value,
+                  "benchmark_value": benchmark[index - 1],
+                  "cash": 0.0,
+              })
+          backtest = {
+              "engine_version": "2.0.0",
+              "validation_status": "PRODUCTION_VALID",
+              "configuration_sha256": "a" * 64,
+              "data_manifest_sha256": "b" * 64,
+              "integrity_validation": {"passed": True, "failed": []},
+              "integrity_flags": [],
+              "metrics": _metrics(values),
+              "benchmark_metrics": _metrics(benchmark),
+              "relative_metrics": {},
+              "turnover": {"cumulative_one_way": 0.42},
+              "transaction_costs": 87.5,
+              "rebalance_records": [],
+              "transaction_ledger": [],
+              "equity_curve": curve,
+          }
+          (root / "historical-replay-manifest.json").write_text(json.dumps(replay, indent=2, sort_keys=True) + "\n")
+          (root / "backtest-output.json").write_text(json.dumps(backtest, indent=2, sort_keys=True) + "\n")
+          PY
+
+      - name: Certify walk-forward performance analytics
+        shell: bash
+        run: |
+          set +e
+          python -m winner_tilt.performance_analytics \
+            --replay-manifest artifacts/performance-analytics/input/historical-replay-manifest.json \
+            --backtest-output artifacts/performance-analytics/input/backtest-output.json \
+            --authorization "${{ inputs.authorization }}" \
+            --output artifacts/performance-analytics/output/performance-certification.json \
+            2>&1 | tee artifacts/performance-analytics/output/performance-analytics-output.log
+          status=${PIPESTATUS[0]}
+          set -e
+          exit "$status"
+
+      - name: Build research summary and certification manifest
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path("artifacts/performance-analytics")
+          report_path = root / "output/performance-certification.json"
+          report = json.loads(report_path.read_text())
+          if report["status"] != "PERFORMANCE_CERTIFIED":
+              raise SystemExit("Expected PERFORMANCE_CERTIFIED")
+          if any(report["execution_boundary"].values()):
+              raise SystemExit("Execution boundary violation")
+          summary = {
+              "status": "CERTIFIED_RESEARCH_SUMMARY",
+              "period": {"start": report["period_start"], "end": report["period_end"]},
+              "observation_count": report["observation_count"],
+              "portfolio_metrics": report["metrics"],
+              "benchmark_metrics": report["benchmark_metrics"],
+              "relative_metrics": report["relative_metrics"],
+              "turnover": report["turnover"],
+              "transaction_costs": report["transaction_costs"],
+              "readiness_summary": report["readiness_summary"],
+              "research_only": True,
+          }
+          summary_path = root / "output/performance-research-summary.json"
+          summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
+          files = {
+              "historical_replay_manifest": root / "input/historical-replay-manifest.json",
+              "backtest_output": root / "input/backtest-output.json",
+              "performance_certification": report_path,
+              "performance_research_summary": summary_path,
+          }
+          manifest = {
+              "status": "COMPLETED_PERFORMANCE_ANALYTICS_RESEARCH_ONLY",
+              "artifacts": {name: str(path.relative_to(root)) for name, path in files.items()},
+              "artifact_sha256": {name: hashlib.sha256(path.read_bytes()).hexdigest() for name, path in files.items()},
+              "execution_boundary": report["execution_boundary"],
+              "broker_integration_enabled": False,
+          }
+          encoded = json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode()
+          manifest["manifest_sha256"] = hashlib.sha256(encoded).hexdigest()
+          (root / "output/performance-certification-manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+          PY
+
+      - name: Upload performance certification artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-analytics-certification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/performance-analytics/
+          if-no-files-found: error
+          retention-days: 30
