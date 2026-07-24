@@ -161,7 +161,7 @@ def test_full_pipeline_emits_backtest_compatible_certified_vintage(tmp_path):
     assert vintage["results"][0]["available_at"] == "2026-01-31T12:00:00Z"
     assert vintage["results"][0]["total_score"] == 50.0
     assert vintage["safety_boundary"]["portfolio_consumption"] is False
-    assert len(vintage["lineage"]) == 9
+    assert len(vintage["lineage"]) == 10
 
     output = tmp_path / "vintages.json"
     write_json(output, result)
