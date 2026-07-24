@@ -1,0 +1,147 @@
+name: Portfolio Risk Certification
+
+on:
+  workflow_dispatch:
+    inputs:
+      authorization:
+        description: Explicit research-only portfolio risk certification authorization
+        required: true
+        type: choice
+        options:
+          - AUTHORIZE_PORTFOLIO_RISK_RESEARCH_ONLY
+
+permissions:
+  contents: read
+
+jobs:
+  portfolio-risk-certification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Build deterministic certified risk fixtures
+        run: |
+          mkdir -p artifacts/portfolio-risk/input artifacts/portfolio-risk/output
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path("artifacts/portfolio-risk/input")
+          portfolio = {
+              "status": "CERTIFIED_PORTFOLIO_RESEARCH_ONLY",
+              "positions": [
+                  {"symbol": "AAA", "sector": "Technology", "weight": 0.40},
+                  {"symbol": "BBB", "sector": "Healthcare", "weight": 0.35},
+                  {"symbol": "CCC", "sector": "Technology", "weight": 0.25},
+              ],
+          }
+          curve = [
+              {"date": "2025-01-01", "portfolio_value": 100000.0, "benchmark_value": 100000.0},
+              {"date": "2025-01-02", "portfolio_value": 102000.0, "benchmark_value": 101000.0},
+              {"date": "2025-01-03", "portfolio_value": 101000.0, "benchmark_value": 101500.0},
+              {"date": "2025-01-04", "portfolio_value": 104000.0, "benchmark_value": 102000.0},
+              {"date": "2025-01-05", "portfolio_value": 103500.0, "benchmark_value": 102400.0},
+              {"date": "2025-01-06", "portfolio_value": 106000.0, "benchmark_value": 104000.0},
+          ]
+          performance = {
+              "status": "PERFORMANCE_CERTIFIED",
+              "equity_curve": curve,
+              "execution_boundary": {
+                  "broker_connected": False,
+                  "orders_created": False,
+                  "orders_executed": False,
+                  "automatic_dca": False,
+                  "automatic_exits": False,
+              },
+          }
+          replay = {
+              "status": "CERTIFIED_HISTORICAL_REPLAY_RESEARCH_ONLY",
+              "period_count": 3,
+              "portfolio_ready_period_count": 2,
+              "insufficient_coverage_period_count": 1,
+          }
+          for name, payload in {
+              "portfolio.json": portfolio,
+              "performance-certification.json": performance,
+              "historical-replay-manifest.json": replay,
+          }.items():
+              (root / name).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+          PY
+
+      - name: Certify portfolio risk analytics
+        shell: bash
+        run: |
+          set +e
+          python -m winner_tilt.portfolio_risk \
+            --portfolio artifacts/portfolio-risk/input/portfolio.json \
+            --performance artifacts/portfolio-risk/input/performance-certification.json \
+            --replay-manifest artifacts/portfolio-risk/input/historical-replay-manifest.json \
+            --authorization "${{ inputs.authorization }}" \
+            --output artifacts/portfolio-risk/output/portfolio-risk-report.json \
+            2>&1 | tee artifacts/portfolio-risk/output/portfolio-risk-output.log
+          status=${PIPESTATUS[0]}
+          set -e
+          exit "$status"
+
+      - name: Build research summary and certification manifest
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          root = Path("artifacts/portfolio-risk")
+          report_path = root / "output/portfolio-risk-report.json"
+          report = json.loads(report_path.read_text())
+          if report["status"] != "PORTFOLIO_RISK_CERTIFIED_RESEARCH_ONLY":
+              raise SystemExit("Expected certified risk status")
+          if any(report["execution_boundary"].values()):
+              raise SystemExit("Execution boundary violation")
+          summary = {
+              "status": "CERTIFIED_PORTFOLIO_RISK_SUMMARY_RESEARCH_ONLY",
+              "position_count": report["position_count"],
+              "sector_count": report["sector_count"],
+              "concentration": report["concentration"],
+              "market_risk": report["market_risk"],
+              "largest_holdings": report["largest_holdings"],
+              "sector_exposure": report["sector_exposure"],
+              "readiness_summary": report["readiness_summary"],
+              "research_only": True,
+          }
+          summary_path = root / "output/portfolio-risk-summary.json"
+          summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
+          files = {
+              "portfolio": root / "input/portfolio.json",
+              "performance_certification": root / "input/performance-certification.json",
+              "historical_replay_manifest": root / "input/historical-replay-manifest.json",
+              "portfolio_risk_report": report_path,
+              "portfolio_risk_summary": summary_path,
+          }
+          manifest = {
+              "status": "COMPLETED_PORTFOLIO_RISK_ANALYTICS_RESEARCH_ONLY",
+              "artifacts": {name: str(path.relative_to(root)) for name, path in files.items()},
+              "artifact_sha256": {name: hashlib.sha256(path.read_bytes()).hexdigest() for name, path in files.items()},
+              "execution_boundary": report["execution_boundary"],
+              "broker_integration_enabled": False,
+          }
+          encoded = json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode()
+          manifest["manifest_sha256"] = hashlib.sha256(encoded).hexdigest()
+          (root / "output/portfolio-risk-manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+          PY
+
+      - name: Upload portfolio risk certification artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-risk-certification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/portfolio-risk/
+          if-no-files-found: error
+          retention-days: 30
