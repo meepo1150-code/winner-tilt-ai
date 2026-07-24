@@ -67,10 +67,13 @@ def test_single_snapshot_is_required_and_discovered_recursively(tmp_path):
         select_single_snapshot(directory)
 
 
-def test_authorized_workflow_uses_recursive_cik_snapshot_lookup():
+def test_authorized_workflow_uses_live_snapshot_contract_and_canonical_universe_path():
     workflow = Path(".github/workflows/authorized-live-sec-shadow.yml").read_text(encoding="utf-8")
     assert "find runtime/live-sec -type f -name 'CIK*.json'" in workflow
     assert "find runtime/live-sec -maxdepth 1" not in workflow
+    assert "--universe database/universe-v1.0.csv" in workflow
+    assert "--universe data/universe-v1.0.csv" not in workflow
+    assert Path("database/universe-v1.0.csv").is_file()
 
 
 def test_bundle_certification_hashes_artifacts_and_preserves_execution_boundary(tmp_path):
