@@ -154,3 +154,41 @@ def build_dashboard_view_model(loaded: dict[str, DashboardInput], *, stale_after
         "freshness": freshness,
         "journal": {"recent_entries": journal_records, "integrity": journal.data["integrity"] if journal else None},
     }
+
+
+def build_shadow_portfolio_view_model(shadow: dict, journal_record: dict | None = None) -> dict:
+    """Create a presentation-only view of one certified non-executable shadow portfolio."""
+    from winner_tilt.shadow_audit import validate_shadow_payload
+
+    validate_shadow_payload(shadow)
+    portfolio = shadow["portfolio"]
+    holdings = sorted(portfolio["holdings"], key=lambda row: row.get("portfolio_rank", 999))
+    reserves = sorted(portfolio["reserves"], key=lambda row: row.get("reserve_rank", 999))
+    audit = None
+    if journal_record is not None:
+        validate_record(journal_record)
+        if journal_record.get("validation_status") != "SHADOW_CERTIFIED_RESEARCH_ONLY":
+            raise ValueError("Dashboard journal record is not a certified shadow audit")
+        audit = {
+            "journal_record_id": journal_record["journal_record_id"],
+            "immutable_record_hash": journal_record["immutable_record_hash"],
+            "decision_timestamp_utc": journal_record["decision_timestamp_utc"],
+            "validation_status": journal_record["validation_status"],
+        }
+    return {
+        "status": {
+            "dashboard_mode": "READ_ONLY_SHADOW_RESEARCH_ONLY",
+            "as_of_date": shadow["as_of_date"],
+            "certification_status": shadow["certification"]["status"],
+            "orders_enabled": False,
+            "warning": "Shadow research output only; not an executable investment instruction.",
+        },
+        "holdings": [{**row, "weight_pct": _pct(row.get("weight"))} for row in holdings],
+        "reserves": reserves,
+        "exits": portfolio.get("exits", []),
+        "dca_allocation": portfolio.get("dca_allocation", {}),
+        "portfolio_summary": portfolio.get("portfolio_summary", {}),
+        "lineage": dict(shadow["lineage"]),
+        "execution_boundary": dict(shadow["execution_boundary"]),
+        "audit": audit,
+    }
